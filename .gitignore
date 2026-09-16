@@ -34,7 +34,8 @@ htmlcov/
 *.db-journal
 *.sqlite
 *.sqlite3
-data/
+data/*
+!data/.gitkeep
 chroma_db/
 vector_store/
 

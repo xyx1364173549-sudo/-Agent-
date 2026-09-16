@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>项目实施计划表 · 进度看板</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #0d1117; color: #e6edf3; line-height: 1.6;
+  font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif;
+  padding: 32px 24px 64px;
+}
+.wrap { max-width: 1180px; margin: 0 auto; }
+header { margin-bottom: 28px; }
+h1 { font-size: 24px; font-weight: 650; letter-spacing: .3px; }
+.sub { color: #8b949e; font-size: 13px; margin-top: 6px; }
+.headline { display: flex; align-items: baseline; gap: 14px; margin: 22px 0 10px; }
+.headline .pct { font-size: 38px; font-weight: 700; color: #58a6ff; font-variant-numeric: tabular-nums; }
+.headline .pct small { font-size: 16px; color: #8b949e; font-weight: 500; margin-left: 2px; }
+.headline .now { color: #8b949e; font-size: 13px; margin-left: auto; }
+.bar { height: 10px; background: #21262d; border-radius: 999px; overflow: hidden; border: 1px solid #30363d; }
+.bar > span { display: block; height: 100%; border-radius: 999px;
+  background: linear-gradient(90deg, #1f6feb, #58a6ff); transition: width .4s ease; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px; margin: 20px 0 34px; }
+.stat { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 14px 16px; }
+.stat .k { color: #8b949e; font-size: 12px; letter-spacing: .4px; }
+.stat .v { font-size: 22px; font-weight: 650; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.v.done { color: #3fb950; } .v.doing { color: #d29922; }
+.v.blocked { color: #f85149; } .v.todo { color: #8b949e; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(348px, 1fr)); gap: 16px; }
+.card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 18px;
+  display: flex; flex-direction: column; }
+.card.finished { border-color: #238636; }
+.card.active { border-color: #1f6feb; box-shadow: 0 0 0 1px rgba(31,111,235,.35); }
+.card.codes { padding: 22px 0; }
+.card-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.badge { font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 6px;
+  background: #1f6feb22; color: #58a6ff; border: 1px solid #1f6feb55; font-family: Consolas, monospace; }
+.card.finished .badge { background: #23863622; color: #3fb950; border-color: #23863655; }
+.card-title { font-size: 15px; font-weight: 600; }
+.tag { font-size: 11px; color: #8b949e; border: 1px solid #30363d; border-radius: 999px;
+  padding: 1px 9px; margin-left: auto; white-space: nowrap; }
+.card-sub { display: flex; justify-content: space-between; color: #8b949e; font-size: 12px; margin: 12px 0 6px; }
+.card .bar { height: 6px; }
+.tasks { list-style: none; margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+.tasks li { display: flex; gap: 9px; font-size: 13px; align-items: flex-start; }
+.tasks .ico { flex: 0 0 16px; text-align: center; font-weight: 700; line-height: 1.5; }
+.tasks .code { color: #6e7681; font-family: Consolas, monospace; font-size: 12px; flex: 0 0 auto; }
+.tasks .txt { flex: 1; }
+.tasks .deliver { display: block; color: #6e7681; font-size: 11.5px; margin-top: 2px; }
+li.done .ico { color: #3fb950; } li.done .txt { color: #8b949e; text-decoration: line-through;
+  text-decoration-color: #484f58; }
+li.doing .ico { color: #d29922; } li.doing .txt { color: #e6edf3; font-weight: 600; }
+li.blocked .ico { color: #f85149; } li.blocked .txt { color: #f85149; }
+li.todo .ico { color: #484f58; } li.todo .txt { color: #c9d1d9; }
+footer { margin-top: 40px; color: #6e7681; font-size: 12px; border-top: 1px solid #21262d; padding-top: 16px; }
+footer code { background: #161b22; border: 1px solid #30363d; border-radius: 5px; padding: 1px 6px;
+  font-family: Consolas, monospace; color: #8b949e; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>项目实施计划表</h1>
+    <div class="sub">数据源：PLAN.md（本看板由 scripts/gen_progress.py 自动生成，请勿直接编辑）</div>
+  </header>
+
+  <div class="headline">
+    <span class="pct">14.3<small>%</small></span>
+    <span class="sub">7 / 49 条子任务完成</span>
+    <span class="now">当前进行：M1 LLM 接入层 · 多模型统一调用</span>
+  </div>
+  <div class="bar "><span style="width:14.3%"></span></div>
+  <div class="stats"><div class="stat"><div class="k">总任务</div><div class="v ">49</div></div><div class="stat"><div class="k">已完成</div><div class="v done">7</div></div><div class="stat"><div class="k">进行中</div><div class="v doing">0</div></div><div class="stat"><div class="k">待办</div><div class="v todo">42</div></div><div class="stat"><div class="k">阻塞</div><div class="v blocked">0</div></div></div>
+
+  <div class="grid"><section class="card finished"><div class="card-head"><span class="badge">M0</span><span class="card-title">工程地基 · 项目骨架与测试脚手架</span><span class="tag">全局前置</span></div><div class="card-sub"><span>7 / 7 完成</span><span>100.0%</span></div><div class="bar "><span style="width:100.0%"></span></div><ul class="tasks"><li class="done"><span class="ico">✓</span><span class="code">M0.1</span><span class="txt">建立目录骨架与包初始化<span class="deliver">交付：`src/{llm,memory,rag,planning,agents,api,utils}`、`tests/`、`docs/`、`data/`、`scripts/`</span></span></li><li class="done"><span class="ico">✓</span><span class="code">M0.2</span><span class="txt">依赖清单与工具配置<span class="deliver">交付：`requirements.txt` + `requirements-dev.txt`、`pytest.ini`、`.gitignore` 补全</span></span></li><li class="done"><span class="ico">✓</span><span class="code">M0.3</span><span class="txt">配置中心<span class="deliver">交付：`src/config.py`，含 .env 加载、类型转换、缺键校验、单例访问</span></span></li><li class="done"><span class="ico">✓</span><span class="code">M0.4</span><span class="txt">统一日志模块<span class="deliver">交付：`src/utils/logger.py`，控制台 + 文件双通道</span></span></li><li class="done"><span class="ico">✓</span><span class="code">M0.5</span><span class="txt">测试脚手架<span class="deliver">交付：`tests/conftest.py` + 首批 91 条用例（配置中心边界 + 日志幂等 + 看板解析 + 骨架冒烟），全绿</span></span></li><li class="done"><span class="ico">✓</span><span class="code">M0.6</span><span class="txt">进度看板生成器<span class="deliver">交付：`scripts/gen_progress.py` + `docs/progress.html`</span></span></li><li class="done"><span class="ico">✓</span><span class="code">M0.7</span><span class="txt">一键校验脚本<span class="deliver">交付：`scripts/check.py`，串联 pytest 与看板生成</span></span></li></ul></section><section class="card active"><div class="card-head"><span class="badge">M1</span><span class="card-title">LLM 接入层 · 多模型统一调用</span><span class="tag">第 4/5/6 章支撑</span></div><div class="card-sub"><span>0 / 6 完成</span><span>0.0%</span></div><div class="bar "><span style="width:0.0%"></span></div><ul class="tasks"><li class="todo"><span class="ico">○</span><span class="code">M1.1</span><span class="txt">统一聊天模型工厂<span class="deliver">交付：`src/llm/factory.py`，DeepSeek 与小米 MiMo（OpenAI 兼容）双通道</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M1.2</span><span class="txt">调用健壮性<span class="deliver">交付：超时、指数退避重试、错误分类与可读报错</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M1.3</span><span class="txt">结构化输出解析器<span class="deliver">交付：JSON 提取 + schema 校验 + 失败重试</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M1.4</span><span class="txt">Prompt 模板库<span class="deliver">交付：`src/llm/prompts.py`，集中管理各 Agent 提示词</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M1.5</span><span class="txt">Mock 模型<span class="deliver">交付：离线 MockLLM，使测试不依赖网络</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M1.6</span><span class="txt">测试与连通性验收<span class="deliver">交付：单元测试全绿 + 一次真实 API 调用验证</span></span></li></ul></section><section class="card"><div class="card-head"><span class="badge">M2</span><span class="card-title">分层记忆三件套 · 工作 / 情景 / 语义</span><span class="tag">第 4 章（创新点 1）</span></div><div class="card-sub"><span>0 / 8 完成</span><span>0.0%</span></div><div class="bar "><span style="width:0.0%"></span></div><ul class="tasks"><li class="todo"><span class="ico">○</span><span class="code">M2.1</span><span class="txt">SQLite 存储层与建表迁移<span class="deliver">交付：`src/memory/store.py`，连接管理 + schema 初始化</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M2.2</span><span class="txt">工作记忆 WorkingMemory<span class="deliver">交付：滑动窗口 + token 预算裁剪</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M2.3</span><span class="txt">情景记忆 EpisodicMemory<span class="deliver">交付：事件流写入 + 时间线/相关性检索</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M2.4</span><span class="txt">语义记忆 SemanticMemory<span class="deliver">交付：事实抽取 + 去重合并 + 冲突更新</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M2.5</span><span class="txt">记忆管理器 MemoryManager<span class="deliver">交付：三件套统一门面与路由</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M2.6</span><span class="txt">记忆上下文组装<span class="deliver">交付：分层检索 + 按预算压缩 + 优先级排序</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M2.7</span><span class="txt">遗忘与巩固策略<span class="deliver">交付：时间衰减 + 重要性打分 + 归档</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M2.8</span><span class="txt">记忆模块测试与演示<span class="deliver">交付：测试全绿 + 可运行 demo 脚本</span></span></li></ul></section><section class="card"><div class="card-head"><span class="badge">M3</span><span class="card-title">RAG 四件套 · 切分 / 向量化 / 检索 / 重排</span><span class="tag">第 6 章（创新点 3）</span></div><div class="card-sub"><span>0 / 6 完成</span><span>0.0%</span></div><div class="bar "><span style="width:0.0%"></span></div><ul class="tasks"><li class="todo"><span class="ico">○</span><span class="code">M3.1</span><span class="txt">文档加载与清洗<span class="deliver">交付：`src/rag/loader.py`，支持 md/txt/pdf</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M3.2</span><span class="txt">三种切分策略<span class="deliver">交付：固定长度 / 递归 / 语义切分，`src/rag/splitter.py`</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M3.3</span><span class="txt">向量化与 Chroma 索引<span class="deliver">交付：`src/rag/vectorstore.py`，持久化与增量更新</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M3.4</span><span class="txt">检索器与重排<span class="deliver">交付：向量 / 关键词 / 混合检索 + 重排，`src/rag/retriever.py`</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M3.5</span><span class="txt">知识库构建脚本<span class="deliver">交付：学习资料入库流水线 `scripts/build_kb.py`</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M3.6</span><span class="txt">RAG 测试<span class="deliver">交付：检索与重排单测全绿</span></span></li></ul></section><section class="card"><div class="card-head"><span class="badge">M4</span><span class="card-title">学习者画像 · 动态规划 · 多 Agent 编排</span><span class="tag">第 5 章（创新点 2）</span></div><div class="card-sub"><span>0 / 7 完成</span><span>0.0%</span></div><div class="bar "><span style="width:0.0%"></span></div><ul class="tasks"><li class="todo"><span class="ico">○</span><span class="code">M4.1</span><span class="txt">学习者画像模型<span class="deliver">交付：`src/planning/profile.py`，掌握度/目标/偏好 + 持久化</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M4.2</span><span class="txt">目标拆解器<span class="deliver">交付：`src/planning/decomposer.py`，把学习目标拆为可执行知识点</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M4.3</span><span class="txt">路径规划器<span class="deliver">交付：`src/planning/planner.py`，产出带依赖关系的学习路径</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M4.4</span><span class="txt">三类功能 Agent<span class="deliver">交付：导师 Agent / 出题 Agent / 评估 Agent，`src/agents/`</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M4.5</span><span class="txt">LangGraph 状态图编排<span class="deliver">交付：条件路由 + 循环 + 状态持久化，`src/planning/graph.py`</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M4.6</span><span class="txt">动态重规划<span class="deliver">交付：依据评估结果实时调整后续路径</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M4.7</span><span class="txt">端到端串联与测试<span class="deliver">交付：完整学-练-评-调闭环 demo + 测试全绿</span></span></li></ul></section><section class="card"><div class="card-head"><span class="badge">M5</span><span class="card-title">FastAPI 服务层 · 接口与流式输出</span><span class="tag">第 6 章</span></div><div class="card-sub"><span>0 / 4 完成</span><span>0.0%</span></div><div class="bar "><span style="width:0.0%"></span></div><ul class="tasks"><li class="todo"><span class="ico">○</span><span class="code">M5.1</span><span class="txt">应用工厂与路由分层<span class="deliver">交付：`src/api/app.py`、`routers/`</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M5.2</span><span class="txt">会话与对话接口<span class="deliver">交付：SSE 流式对话端点</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M5.3</span><span class="txt">记忆 · 画像 · 进度查询接口<span class="deliver">交付：状态可见性接口</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M5.4</span><span class="txt">服务层测试<span class="deliver">交付：TestClient 用例全绿</span></span></li></ul></section><section class="card"><div class="card-head"><span class="badge">M6</span><span class="card-title">前端交互界面</span><span class="tag">第 6 章</span></div><div class="card-sub"><span>0 / 3 完成</span><span>0.0%</span></div><div class="bar "><span style="width:0.0%"></span></div><ul class="tasks"><li class="todo"><span class="ico">○</span><span class="code">M6.1</span><span class="txt">页面骨架<span class="deliver">交付：对话区 + 学习路径图 + 记忆面板三栏布局</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M6.2</span><span class="txt">后端联调<span class="deliver">交付：SSE 流式渲染接通真实接口</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M6.3</span><span class="txt">视觉打磨<span class="deliver">交付：深色主题、响应式、加载态与异常态</span></span></li></ul></section><section class="card"><div class="card-head"><span class="badge">M7</span><span class="card-title">实验与评估 · 论文 3 组实验</span><span class="tag">第 6 章（3 组实验）</span></div><div class="card-sub"><span>0 / 5 完成</span><span>0.0%</span></div><div class="bar "><span style="width:0.0%"></span></div><ul class="tasks"><li class="todo"><span class="ico">○</span><span class="code">M7.1</span><span class="txt">实验数据集与指标定义<span class="deliver">交付：测试集 + 评价指标（记忆命中率、路径合理性、回答质量）</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M7.2</span><span class="txt">实验一：分层记忆消融<span class="deliver">交付：无记忆 / 仅工作记忆 / 全分层记忆 对比</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M7.3</span><span class="txt">实验二：切分与检索策略对比<span class="deliver">交付：三种切分 × 三种检索 交叉实验</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M7.4</span><span class="txt">实验三：动态规划 vs 静态路径<span class="deliver">交付：学习效率与路径适应性对比</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M7.5</span><span class="txt">结果图表与实验报告<span class="deliver">交付：论文可用图表 + 实验章节素材</span></span></li></ul></section><section class="card"><div class="card-head"><span class="badge">M8</span><span class="card-title">工程化与论文素材</span><span class="tag">全局收尾</span></div><div class="card-sub"><span>0 / 3 完成</span><span>0.0%</span></div><div class="bar "><span style="width:0.0%"></span></div><ul class="tasks"><li class="todo"><span class="ico">○</span><span class="code">M8.1</span><span class="txt">Docker 容器化<span class="deliver">交付：`Dockerfile` + `docker-compose.yml`</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M8.2</span><span class="txt">部署与运行文档<span class="deliver">交付：`docs/deployment.md`</span></span></li><li class="todo"><span class="ico">○</span><span class="code">M8.3</span><span class="txt">论文素材归档<span class="deliver">交付：架构图、流程图、伪代码、关键截图集中归档</span></span></li></ul></section></div>
+
+  <footer>
+    生成时间：2026-09-16 17:04　·　更新进度请编辑 <code>PLAN.md</code> 的复选框，然后运行
+    <code>python scripts/gen_progress.py</code>
+  </footer>
+</div>
+</body>
+</html>
