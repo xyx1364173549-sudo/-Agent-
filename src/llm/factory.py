@@ -17,8 +17,8 @@ from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-# 默认模型。deepseek-chat 是通用对话模型；deepseek-reasoner 擅长推理但更慢更贵。
-DEFAULT_MODEL = "deepseek-chat"
+# 默认模型。换模型时改这一行，或在调用时显式传 model= 参数。
+DEFAULT_MODEL = "deepseek-flash"
 
 
 def create_chat_model(
@@ -33,7 +33,7 @@ def create_chat_model(
     参数
     ----
     model:
-        模型名，默认 ``deepseek-chat``。
+        模型名，默认 ``deepseek-flash``。
     temperature:
         采样温度。0 最稳定、1 最发散。默认 0.3——学习路径规划要的是可复现，
         不是天马行空。
