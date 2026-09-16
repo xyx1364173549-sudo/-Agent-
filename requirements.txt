@@ -6,3 +6,9 @@
 
 # ---------- M0 工程地基 ----------
 python-dotenv>=1.0.1
+
+# ---------- M1 LLM 接入层 ----------
+# langchain-core 被直接 import（BaseChatModel 统一抽象），因此显式声明，
+# 不依赖 langchain-openai 的传递依赖——否则将来上游放宽约束时会静默漂移。
+langchain-core>=1.6.3
+langchain-openai>=1.6.2
