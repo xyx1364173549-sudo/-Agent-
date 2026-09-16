@@ -1,0 +1,68 @@
+# ---------- 密钥与环境变量（切记不要提交） ----------
+.env
+.env.*
+!.env.example
+
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# 虚拟环境
+.venv/
+venv/
+env/
+ENV/
+
+# ---------- 测试与缓存 ----------
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.tox/
+
+# ---------- 数据与数据库（分层记忆持久化文件） ----------
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+data/
+chroma_db/
+vector_store/
+
+# ---------- 模型与日志 ----------
+*.log
+logs/
+models/
+*.pt
+*.bin
+*.ckpt
+
+# ---------- IDE / 编辑器 ----------
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ---------- 操作系统 ----------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------- WorkBuddy 本地工作数据（含本地记忆日志，含个人隐私，不入库） ----------
+.workbuddy/
+
+# ---------- 论文与文档中间产物 ----------
+~$*.docx
+~$*.pptx
+~$*.xlsx
+*.tmp
