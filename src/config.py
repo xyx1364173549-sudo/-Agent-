@@ -20,12 +20,6 @@ from typing import Mapping
 # 项目根目录（本文件位于 src/ 下，上一级即根目录）
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
-# 支持的模型提供方 -> 对应的密钥字段名
-PROVIDER_KEY_FIELD: dict[str, str] = {
-    "deepseek": "deepseek_api_key",
-    "mimo": "mimo_api_key",
-}
-
 
 class ConfigError(Exception):
     """配置缺失或取值非法时抛出。"""
@@ -76,9 +70,6 @@ class Settings:
 
     deepseek_api_key: str | None
     deepseek_base_url: str
-    mimo_api_key: str | None
-    mimo_base_url: str
-    mimo_model: str
     embedding_model: str
     api_host: str
     api_port: int
@@ -107,7 +98,7 @@ class Settings:
         env_file:
             ``.env`` 文件路径，默认取项目根目录下的 ``.env``。
         strict:
-            为 ``True`` 时，缺少任一模型 API Key 直接抛 ``ConfigError``；
+            为 ``True`` 时，缺少 DeepSeek API Key 直接抛 ``ConfigError``；
             为 ``False``（默认）时允许密钥为空，推迟到调用前再校验。
         """
         path = _to_path(str(env_file), "env_file") if env_file else (PROJECT_ROOT / ".env")
@@ -124,9 +115,6 @@ class Settings:
         settings = cls(
             deepseek_api_key=get("DEEPSEEK_API_KEY"),
             deepseek_base_url=_to_url(get("DEEPSEEK_BASE_URL", "https://api.deepseek.com") or "", "DEEPSEEK_BASE_URL"),
-            mimo_api_key=get("MIMO_API_KEY"),
-            mimo_base_url=_to_url(get("MIMO_BASE_URL", "https://api.xiaomi.com/v1") or "", "MIMO_BASE_URL"),
-            mimo_model=get("MIMO_MODEL", "mimo-v2.5") or "mimo-v2.5",
             embedding_model=get("EMBEDDING_MODEL", "text-embedding-3-small") or "text-embedding-3-small",
             api_host=get("API_HOST", "127.0.0.1") or "127.0.0.1",
             api_port=_to_int(get("API_PORT", "8000") or "8000", "API_PORT", minimum=1, maximum=65535),
@@ -137,32 +125,24 @@ class Settings:
         )
 
         if strict:
-            for provider in PROVIDER_KEY_FIELD:
-                settings.require_api_key(provider)
+            settings.require_api_key()
 
         return settings
 
     # ---------- 使用期校验 ----------
 
-    def require_api_key(self, provider: str) -> str:
-        """取出指定提供方的 API Key；未配置时抛出可读错误。
+    def require_api_key(self) -> str:
+        """取出 DeepSeek API Key；未配置时抛出可读错误。
 
         密钥的校验刻意推迟到这一步，是为了让「不调用模型」的代码路径
         （如单元测试、离线索引构建）无需配置任何密钥即可运行。
         """
-        field_name = PROVIDER_KEY_FIELD.get(provider)
-        if field_name is None:
-            supported = "、".join(sorted(PROVIDER_KEY_FIELD))
-            raise ConfigError(f"未知的模型提供方 {provider!r}，当前支持：{supported}")
-
-        value = getattr(self, field_name)
-        if not value:
-            env_name = provider.upper() + "_API_KEY"
+        if not self.deepseek_api_key:
             raise ConfigError(
-                f"未配置 {provider} 的 API Key。请在 {self.env_file} 中设置 {env_name}，"
+                f"未配置 DEEPSEEK_API_KEY。请在 {self.env_file} 中设置该变量，"
                 f"或参考 .env.example 生成配置文件。"
             )
-        return value
+        return self.deepseek_api_key
 
     # ---------- 便捷方法 ----------
 
@@ -192,9 +172,6 @@ class Settings:
         return {
             "deepseek_api_key": mask(self.deepseek_api_key),
             "deepseek_base_url": self.deepseek_base_url,
-            "mimo_api_key": mask(self.mimo_api_key),
-            "mimo_base_url": self.mimo_base_url,
-            "mimo_model": self.mimo_model,
             "embedding_model": self.embedding_model,
             "api_host": self.api_host,
             "api_port": self.api_port,

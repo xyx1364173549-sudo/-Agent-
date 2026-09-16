@@ -17,7 +17,7 @@
 - **RAG**：文本切分 → 向量化 → Chroma 检索 → 重排
 - **后端**：FastAPI + SSE 流式输出
 - **持久化**：SQLite（分层记忆）、JSON（早期原型）
-- **模型接入**：DeepSeek API、小米 MiMo（OpenAI 兼容协议）
+- **模型接入**：DeepSeek API（OpenAI 兼容协议）
 - **工程化**：Docker 容器化、MCP 协议
 
 ## 目录规划
@@ -58,9 +58,12 @@ python -m src.main
 
 | 变量名 | 说明 |
 | --- | --- |
-| `DEEPSEEK_API_KEY` | DeepSeek 平台密钥 |
-| `MIMO_API_KEY` | 小米 MiMo 密钥 |
-| `MIMO_BASE_URL` | MiMo 接口地址 |
+| `DEEPSEEK_API_KEY` | DeepSeek 平台密钥（**必填**） |
+| `DEEPSEEK_BASE_URL` | 接口地址，默认 `https://api.deepseek.com` |
+| `MEMORY_DB_PATH` | 分层记忆 SQLite 文件位置 |
+| `CHROMA_PERSIST_DIR` | 向量库持久化目录 |
+| `API_HOST` / `API_PORT` | FastAPI 监听地址与端口 |
+| `LOG_DIR` | 日志文件目录 |
 
 > `.env` 已在 `.gitignore` 中排除，请勿将真实密钥提交到仓库。
 

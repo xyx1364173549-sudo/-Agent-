@@ -63,5 +63,5 @@ def test_gitignore_protects_secrets(project_root: Path) -> None:
 def test_env_example_documents_required_vars(project_root: Path) -> None:
     """模板即文档：换台机器时能否跑起来，取决于模板是否写全。"""
     content = (project_root / ".env.example").read_text(encoding="utf-8")
-    for var in ["DEEPSEEK_API_KEY", "MIMO_API_KEY", "MIMO_BASE_URL", "MEMORY_DB_PATH", "API_PORT"]:
+    for var in ["DEEPSEEK_API_KEY", "DEEPSEEK_BASE_URL", "MEMORY_DB_PATH", "API_PORT", "LOG_DIR"]:
         assert var in content, f".env.example 未说明变量：{var}"
