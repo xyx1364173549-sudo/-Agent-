@@ -1,13 +1,17 @@
-"""配置中心。
+"""配置中心：路径与端口。
 
-三条设计原则：
+管的是「文件放哪、服务监听哪」这类项目配置——数据库、向量库、日志目录、
+API 监听地址。这些配置的共同点是：**和调用大模型无关**。
 
-1. **单一入口**：全项目只通过 ``get_settings()`` 读取配置，不散落 ``os.getenv``。
-2. **缺密钥不炸导入**：读取配置时只做类型转换，不在导入期校验密钥。
-   只有真正要调外部服务时，才用 ``Settings.require_api_key()`` 强校验。
-   这样单元测试和离线开发不会因为缺 ``.env`` 而整体崩掉。
-3. **可注入**：``from_env(environ=...)`` 允许测试完全替换环境变量来源，避免真实
-   环境干扰测试结果。
+大模型的密钥与接口地址**不在这里**，而在 ``src/llm/factory.py``。
+两部分刻意分开：模型接入层自己负责自己的连接配置，
+换模型、换密钥时不必翻到这个文件里来。
+
+设计原则：
+
+1. **单一入口**：全项目只通过 ``get_settings()`` 读取，不散落 ``os.getenv``。
+2. **可注入**：``from_env(environ=...)`` 允许测试完全替换环境变量来源，
+   避免本机真实 ``.env`` 干扰测试结果。
 """
 
 from __future__ import annotations
@@ -42,14 +46,6 @@ def _to_path(raw: str, key: str) -> Path:
     return path if path.is_absolute() else (PROJECT_ROOT / path)
 
 
-def _to_url(raw: str, key: str) -> str:
-    """接口地址必须以 http(s):// 开头，否则八成是填错了。"""
-    value = str(raw).strip().rstrip("/")
-    if not value.startswith(("http://", "https://")):
-        raise ConfigError(f"配置项 {key} 需为 http(s):// 开头的地址，实际为 {value!r}")
-    return value
-
-
 def read_env_file(env_file: Path) -> dict[str, str]:
     """读取 ``.env`` 文件；文件不存在时返回空字典（视为全部走默认值）。"""
     if not env_file.exists():
@@ -66,10 +62,8 @@ def read_env_file(env_file: Path) -> dict[str, str]:
 
 @dataclass(frozen=True)
 class Settings:
-    """全项目配置对象。字段全部为不可变类型，创建后不允许就地修改。"""
+    """项目配置对象。字段全部为不可变类型，创建后不允许就地修改。"""
 
-    deepseek_api_key: str | None
-    deepseek_base_url: str
     embedding_model: str
     api_host: str
     api_port: int
@@ -86,7 +80,6 @@ class Settings:
         environ: Mapping[str, str] | None = None,
         *,
         env_file: str | Path | None = None,
-        strict: bool = False,
     ) -> "Settings":
         """从环境变量构造配置。
 
@@ -97,9 +90,6 @@ class Settings:
             以保证测试结果不受本机已有变量干扰；传 ``None`` 则读取 ``os.environ``。
         env_file:
             ``.env`` 文件路径，默认取项目根目录下的 ``.env``。
-        strict:
-            为 ``True`` 时，缺少 DeepSeek API Key 直接抛 ``ConfigError``；
-            为 ``False``（默认）时允许密钥为空，推迟到调用前再校验。
         """
         path = _to_path(str(env_file), "env_file") if env_file else (PROJECT_ROOT / ".env")
 
@@ -112,9 +102,7 @@ class Settings:
                 return default
             return str(value).strip()
 
-        settings = cls(
-            deepseek_api_key=get("DEEPSEEK_API_KEY"),
-            deepseek_base_url=_to_url(get("DEEPSEEK_BASE_URL", "https://api.deepseek.com") or "", "DEEPSEEK_BASE_URL"),
+        return cls(
             embedding_model=get("EMBEDDING_MODEL", "text-embedding-3-small") or "text-embedding-3-small",
             api_host=get("API_HOST", "127.0.0.1") or "127.0.0.1",
             api_port=_to_int(get("API_PORT", "8000") or "8000", "API_PORT", minimum=1, maximum=65535),
@@ -123,26 +111,6 @@ class Settings:
             log_dir=_to_path(get("LOG_DIR", "./logs") or "", "LOG_DIR"),
             env_file=path,
         )
-
-        if strict:
-            settings.require_api_key()
-
-        return settings
-
-    # ---------- 使用期校验 ----------
-
-    def require_api_key(self) -> str:
-        """取出 DeepSeek API Key；未配置时抛出可读错误。
-
-        密钥的校验刻意推迟到这一步，是为了让「不调用模型」的代码路径
-        （如单元测试、离线索引构建）无需配置任何密钥即可运行。
-        """
-        if not self.deepseek_api_key:
-            raise ConfigError(
-                f"未配置 DEEPSEEK_API_KEY。请在 {self.env_file} 中设置该变量，"
-                f"或参考 .env.example 生成配置文件。"
-            )
-        return self.deepseek_api_key
 
     # ---------- 便捷方法 ----------
 
@@ -159,19 +127,9 @@ class Settings:
                 created.append(target)
         return created
 
-    def as_dict(self, *, mask_secrets: bool = True) -> dict[str, object]:
-        """导出为字典，便于日志打印与接口调试。默认对密钥打码。"""
-
-        def mask(value: str | None) -> str | None:
-            if value is None:
-                return None
-            if not mask_secrets:
-                return value
-            return value[:4] + "***" + value[-2:] if len(value) > 8 else "***"
-
+    def as_dict(self) -> dict[str, object]:
+        """导出为字典，便于日志打印与接口调试。"""
         return {
-            "deepseek_api_key": mask(self.deepseek_api_key),
-            "deepseek_base_url": self.deepseek_base_url,
             "embedding_model": self.embedding_model,
             "api_host": self.api_host,
             "api_port": self.api_port,

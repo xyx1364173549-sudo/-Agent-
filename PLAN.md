@@ -41,7 +41,7 @@
 ## [M1] LLM 接入层 · 多模型统一调用
 <!-- section: 第 4/5/6 章支撑 -->
 
-- [x] M1.1 聊天模型工厂 — 交付：`src/llm/factory.py`，DeepSeek 统一入口（模型名 / 温度 / 超时）
+- [x] M1.1 聊天模型工厂 — 交付：`src/llm/factory.py`，DeepSeek 统一入口（模型名 / 温度）
 - [ ] M1.2 调用健壮性 — 交付：超时、指数退避重试、错误分类与可读报错
 - [ ] M1.3 结构化输出解析器 — 交付：JSON 提取 + schema 校验 + 失败重试
 - [ ] M1.4 Prompt 模板库 — 交付：`src/llm/prompts.py`，集中管理各 Agent 提示词
@@ -122,3 +122,4 @@
 | 2026-09-16 | M0 工程地基完成：目录骨架、配置中心、日志模块、91 条测试全绿、进度看板与一键校验脚本 |
 | 2026-09-16 | M1.1 完成：聊天模型工厂 `src/llm/factory.py`，DeepSeek 统一入口 + 密钥防泄漏 |
 | 2026-09-16 | **简化重构**：移除小米 MiMo 支持与「多提供方」抽象，收敛为 DeepSeek 单提供方；同步清理 config、.env.example、README、src/__init__ 与测试 |
+| 2026-09-16 | **M1.1 二次简化**：改用 `langchain-deepseek` 的 `ChatDeepSeek`，代码为「load_dotenv → os.getenv → ChatDeepSeek」三步直写；默认模型 `deepseek-v4-flash`；`config.py` 职责收窄为「路径与端口」 |

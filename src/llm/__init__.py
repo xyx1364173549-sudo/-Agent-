@@ -2,8 +2,8 @@
 
 对外只暴露 ``create_chat_model()``。
 
-业务代码不要直接 ``from langchain_openai import ChatOpenAI``——那样以后
-换模型、加日志、改超时，就得满项目去找散落的构造代码了。
+业务代码不要自己写 ``ChatDeepSeek(...)``，统一从这里拿：
+以后换模型、调温度、加日志，都只改 ``factory.py`` 一个地方。
 """
 
 from src.llm.factory import DEFAULT_MODEL, create_chat_model

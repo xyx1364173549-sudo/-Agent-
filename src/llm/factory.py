@@ -1,83 +1,76 @@
-"""DeepSeek 聊天模型工厂。
+"""DeepSeek 模型接入。
 
-全项目只通过 ``create_chat_model()`` 拿模型，不在业务代码里散落
-``ChatOpenAI(...)``。好处是：以后想换模型、调超时、加日志，只改这一个文件。
+整个项目要调用大模型，都从这里拿。核心就三步：
 
-**只支持 DeepSeek 一个提供方。** 曾设计过一套「多提供方映射表」，但在只有
-一个厂商的场景下，那层抽象只增加阅读成本、不产生任何价值，已移除。
+    1. load_dotenv()      读项目根目录的 .env
+    2. os.getenv(...)     取出密钥和接口地址
+    3. ChatDeepSeek(...)  拼成一个模型对象
+
+为什么外面要包一层 create_chat_model()，而不像下面这样直接写在模块里？
+
+    model = ChatDeepSeek(api_key=..., api_base=..., model_name=...)
+
+因为模块级代码在 **import 的那一刻就会执行**。万一 .env 还没配好，
+整个项目连 import 都会崩，后面所有模块都用不了。包成函数后，
+只有真正要调用模型时才构造它。
 """
 
-from __future__ import annotations
+import os
+from pathlib import Path
 
-from langchain_core.language_models import BaseChatModel
-from langchain_openai import ChatOpenAI
+from dotenv import load_dotenv
+from langchain_deepseek import ChatDeepSeek
 
-from src.config import get_settings
-from src.utils.logger import get_logger
+# 项目根目录（本文件在 src/llm/ 下，往上三层就是根目录）
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
-logger = get_logger(__name__)
+# 读取 .env。这里写死路径，而不是用 load_dotenv() 的默认行为，
+# 是为了保证「不管从哪个目录运行程序」都能读到项目根目录下那个 .env
+load_dotenv(PROJECT_ROOT / ".env")
 
-# 默认模型。换模型时改这一行，或在调用时显式传 model= 参数。
-DEFAULT_MODEL = "deepseek-flash"
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
+DEEPSEEK_BASE_URL = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
 
-
-def _mask(token: str) -> str:
-    """只保留密钥首尾各 4 位。
-
-    用途：日志里能看出「这次用的是哪个 key」，方便排查「到底读到没有」，
-    但又不足以还原出完整密钥。密钥一旦整串进日志，就会随日志文件扩散出去。
-    """
-    return f"{token[:4]}***{token[-4:]}" if len(token) > 8 else "***"
+# 默认模型。想换模型就改这一行，或者调用时传 model_name= 参数
+DEFAULT_MODEL = "deepseek-v4-flash"
 
 
 def create_chat_model(
-    model: str = DEFAULT_MODEL,
-    *,
+    model_name: str = DEFAULT_MODEL,
     temperature: float = 0.3,
-    timeout: float = 60.0,
-    api_key: str | None = None,
-) -> BaseChatModel:
-    """创建一个 DeepSeek 聊天模型对象。
+) -> ChatDeepSeek:
+    """创建一个 DeepSeek 聊天模型。
+
+    用法::
+
+        model = create_chat_model()
+        print(model.invoke("你好"))
 
     参数
     ----
-    model:
-        模型名，默认 ``deepseek-flash``。
+    model_name:
+        模型名，默认 ``deepseek-v4-flash``。
     temperature:
-        采样温度。0 最稳定、1 最发散。默认 0.3——学习路径规划要的是可复现，
-        不是天马行空。
-    timeout:
-        单次请求超时秒数（等模型回复的最长时间），默认 60 秒。
-    api_key:
-        一般不用传，默认从 ``.env`` 读取；写测试时可以显式传入假密钥。
+        采样温度。0 最稳定、1 最发散。默认 0.3——学习路径规划要的是
+        可复现，不是天马行空。
 
-    返回
+    注意
     ----
-    LangChain 的 ``BaseChatModel``，可以直接 ``invoke(...)`` 或 ``stream(...)``。
+    这一步**不会联网**，只是把参数拼成一个对象。真正发请求是在
+    ``model.invoke(...)`` 的时候。
 
-    说明
-    ----
-    本函数**不发起网络请求**，只是把参数装配成一个对象。真正的调用发生在
-    ``llm.invoke(...)`` 那一刻。
-
-    若 ``.env`` 里没配 ``DEEPSEEK_API_KEY``，会抛 ``ConfigError``，
-    并提示该改哪个文件、填哪个变量。
+    ``.env`` 里没配 ``DEEPSEEK_API_KEY`` 时会抛 ``RuntimeError``。
     """
-    settings = get_settings()
-    key = api_key or settings.require_api_key()
+    if not DEEPSEEK_API_KEY:
+        raise RuntimeError(
+            "没读到 DEEPSEEK_API_KEY。请检查项目根目录下是否存在 .env 文件，"
+            "且里面有 DEEPSEEK_API_KEY=sk-xxxx 这一行。"
+            "（注意：要填在 .env 里，不是 .env.example）"
+        )
 
-    logger.info(
-        "创建聊天模型 | model=%s | base_url=%s | key=%s（来源：%s）",
-        model,
-        settings.deepseek_base_url,
-        _mask(key),
-        "调用参数" if api_key else settings.env_file.name,
-    )
-
-    return ChatOpenAI(
-        model=model,
-        api_key=key,
-        base_url=settings.deepseek_base_url,
+    return ChatDeepSeek(
+        api_key=DEEPSEEK_API_KEY,
+        api_base=DEEPSEEK_BASE_URL,
+        model_name=model_name,
         temperature=temperature,
-        timeout=timeout,
     )

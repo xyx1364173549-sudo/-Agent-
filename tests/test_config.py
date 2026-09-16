@@ -1,7 +1,10 @@
-"""配置中心测试。
+"""配置中心测试（路径与端口部分）。
 
-重点不在「能不能读到值」，而在**异常路径**——缺键、类型错、越界、
-地址非法、密钥打码、目录幂等创建。这些才是上线后会咬人的地方。
+重点不在「能不能读到值」，而在**异常路径**——类型错、越界、路径解析、
+目录幂等创建。这些才是上线后会咬人的地方。
+
+注意：大模型的密钥不在本模块测试范围内，它归 ``src/llm/factory.py`` 管，
+对应的测试在 ``tests/test_llm_factory.py``。
 """
 
 from __future__ import annotations
@@ -30,12 +33,11 @@ def build(env_file: Path, **env: str) -> Settings:
 
 
 def test_defaults_when_nothing_configured(missing_env_file: Path) -> None:
-    """零配置也要能构造出可用的 Settings（密钥为空，但不报错）。"""
+    """零配置也要能构造出可用的 Settings。"""
     s = build(missing_env_file)
-    assert s.deepseek_api_key is None
-    assert s.deepseek_base_url == "https://api.deepseek.com"
     assert s.api_host == "127.0.0.1"
     assert s.api_port == 8000
+    assert s.embedding_model == "text-embedding-3-small"
 
 
 def test_relative_path_anchored_to_project_root(missing_env_file: Path) -> None:
@@ -73,79 +75,6 @@ def test_port_must_be_integer(missing_env_file: Path, raw: str) -> None:
 def test_port_must_be_in_valid_range(missing_env_file: Path, raw: str) -> None:
     with pytest.raises(ConfigError, match="区间"):
         build(missing_env_file, API_PORT=raw)
-
-
-def test_base_url_must_look_like_url(missing_env_file: Path) -> None:
-    with pytest.raises(ConfigError, match="http"):
-        build(missing_env_file, DEEPSEEK_BASE_URL="api.deepseek.com")
-
-
-def test_base_url_trailing_slash_stripped(missing_env_file: Path) -> None:
-    s = build(missing_env_file, DEEPSEEK_BASE_URL="https://api.deepseek.com/")
-    assert s.deepseek_base_url == "https://api.deepseek.com"
-
-
-# --------------------------------------------------------------------------
-# 密钥校验：延迟到使用时
-# --------------------------------------------------------------------------
-
-
-def test_api_key_not_required_at_construction(missing_env_file: Path) -> None:
-    """构造期不该因为缺密钥就失败——离线建索引、跑测试都不需要密钥。"""
-    s = build(missing_env_file)
-    assert s.deepseek_api_key is None  # 密钥为空，但配置对象本身构造成功
-
-
-def test_require_api_key_raises_with_actionable_message(missing_env_file: Path) -> None:
-    s = build(missing_env_file)
-    with pytest.raises(ConfigError) as exc:
-        s.require_api_key()
-    # 报错要说清「改哪个文件、填哪个变量」，否则用户只能猜
-    assert "DEEPSEEK_API_KEY" in str(exc.value)
-    assert ".env" in str(exc.value)
-
-
-def test_require_api_key_returns_value(missing_env_file: Path) -> None:
-    s = build(missing_env_file, DEEPSEEK_API_KEY="sk-ds-abcdefgh")
-    assert s.require_api_key() == "sk-ds-abcdefgh"
-
-
-def test_strict_mode_rejects_missing_key(missing_env_file: Path) -> None:
-    with pytest.raises(ConfigError):
-        Settings.from_env(environ={}, env_file=missing_env_file, strict=True)
-
-
-def test_strict_mode_passes_when_key_present(missing_env_file: Path) -> None:
-    s = Settings.from_env(
-        environ={"DEEPSEEK_API_KEY": "sk-ds"},
-        env_file=missing_env_file,
-        strict=True,
-    )
-    assert s.deepseek_api_key == "sk-ds"
-
-
-# --------------------------------------------------------------------------
-# 密钥打码
-# --------------------------------------------------------------------------
-
-
-@pytest.mark.parametrize(
-    ("raw", "expected"),
-    [("sk-abcdefghijklmn", "sk-a***mn"), ("short", "***"), ("12345678", "***")],
-)
-def test_as_dict_masks_secrets(missing_env_file: Path, raw: str, expected: str) -> None:
-    """密钥绝不能整串落进日志或接口响应，打码逻辑要卡住边界长度。"""
-    s = build(missing_env_file, DEEPSEEK_API_KEY=raw)
-    assert s.as_dict()["deepseek_api_key"] == expected
-
-
-def test_as_dict_can_reveal_when_explicitly_asked(missing_env_file: Path) -> None:
-    s = build(missing_env_file, DEEPSEEK_API_KEY="sk-abcdefghijklmn")
-    assert s.as_dict(mask_secrets=False)["deepseek_api_key"] == "sk-abcdefghijklmn"
-
-
-def test_as_dict_leaves_none_untouched(missing_env_file: Path) -> None:
-    assert build(missing_env_file).as_dict()["deepseek_api_key"] is None
 
 
 # --------------------------------------------------------------------------
@@ -226,7 +155,6 @@ def test_get_settings_reload_returns_new_object() -> None:
     first = get_settings()
     second = get_settings(reload=True)
     assert second is not first
-    assert second is not None
 
 
 def test_settings_is_immutable(missing_env_file: Path) -> None:
