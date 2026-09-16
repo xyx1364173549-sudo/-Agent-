@@ -21,6 +21,15 @@ logger = get_logger(__name__)
 DEFAULT_MODEL = "deepseek-flash"
 
 
+def _mask(token: str) -> str:
+    """只保留密钥首尾各 4 位。
+
+    用途：日志里能看出「这次用的是哪个 key」，方便排查「到底读到没有」，
+    但又不足以还原出完整密钥。密钥一旦整串进日志，就会随日志文件扩散出去。
+    """
+    return f"{token[:4]}***{token[-4:]}" if len(token) > 8 else "***"
+
+
 def create_chat_model(
     model: str = DEFAULT_MODEL,
     *,
@@ -57,7 +66,13 @@ def create_chat_model(
     settings = get_settings()
     key = api_key or settings.require_api_key()
 
-    logger.info("创建聊天模型 | model=%s | base_url=%s", model, settings.deepseek_base_url)
+    logger.info(
+        "创建聊天模型 | model=%s | base_url=%s | key=%s（来源：%s）",
+        model,
+        settings.deepseek_base_url,
+        _mask(key),
+        "调用参数" if api_key else settings.env_file.name,
+    )
 
     return ChatOpenAI(
         model=model,
