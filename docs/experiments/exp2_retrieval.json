@@ -1,0 +1,2736 @@
+{
+  "config": {
+    "chunk_size": 150,
+    "overlap": 30,
+    "top_k": 2
+  },
+  "results": [
+    {
+      "strategy": "fixed",
+      "mode": "keyword",
+      "chunks": 18,
+      "overall": {
+        "hit": 0.8333,
+        "mrr": 0.8056,
+        "recall": 0.8333,
+        "n": 18
+      },
+      "by_grade": {
+        "high": {
+          "hit": 1.0,
+          "mrr": 1.0,
+          "recall": 1.0,
+          "n": 6
+        },
+        "mid": {
+          "hit": 1.0,
+          "mrr": 1.0,
+          "recall": 1.0,
+          "n": 6
+        },
+        "low": {
+          "hit": 0.5,
+          "mrr": 0.4167,
+          "recall": 0.5,
+          "n": 6
+        }
+      },
+      "rows": [
+        {
+          "query": "递归的终止条件是什么",
+          "grade": "high",
+          "overlap": 0.5556,
+          "expected": [
+            "递归.md"
+          ],
+          "returned": [
+            "递归.md",
+            "二分查找.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "二分查找为什么要先排序",
+          "grade": "mid",
+          "overlap": 0.3,
+          "expected": [
+            "二分查找.md"
+          ],
+          "returned": [
+            "二分查找.md",
+            "二分查找.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "Python 的字典和列表有什么区别",
+          "grade": "mid",
+          "overlap": 0.4375,
+          "expected": [
+            "Python 入门.md"
+          ],
+          "returned": [
+            "Python 入门.md",
+            "动态规划.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "栈和队列的存取顺序",
+          "grade": "high",
+          "overlap": 0.5,
+          "expected": [
+            "栈与队列.md"
+          ],
+          "returned": [
+            "栈与队列.md",
+            "栈与队列.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "哈希表怎么处理冲突",
+          "grade": "high",
+          "overlap": 0.5,
+          "expected": [
+            "哈希表.md"
+          ],
+          "returned": [
+            "哈希表.md",
+            "哈希表.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "快速排序最坏情况是什么",
+          "grade": "high",
+          "overlap": 0.6,
+          "expected": [
+            "排序算法.md"
+          ],
+          "returned": [
+            "排序算法.md",
+            "排序算法.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "时间复杂度的平方级和线性对数级",
+          "grade": "high",
+          "overlap": 0.7143,
+          "expected": [
+            "时间复杂度.md"
+          ],
+          "returned": [
+            "时间复杂度.md",
+            "排序算法.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "动态规划的记忆化",
+          "grade": "high",
+          "overlap": 0.7143,
+          "expected": [
+            "动态规划.md"
+          ],
+          "returned": [
+            "动态规划.md",
+            "栈与队列.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "每次只看中间那个数为什么就够了",
+          "grade": "low",
+          "overlap": 0.2143,
+          "expected": [
+            "二分查找.md"
+          ],
+          "returned": [
+            "二分查找.md",
+            "二分查找.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "怎么用一个名字存一堆相关的东西",
+          "grade": "mid",
+          "overlap": 0.2857,
+          "expected": [
+            "Python 入门.md"
+          ],
+          "returned": [
+            "Python 入门.md",
+            "Python 入门.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "数据本来就差不多有序时会不会变慢",
+          "grade": "mid",
+          "overlap": 0.3333,
+          "expected": [
+            "排序算法.md"
+          ],
+          "returned": [
+            "排序算法.md",
+            "时间复杂度.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "算过的结果能不能留着下次直接用",
+          "grade": "mid",
+          "overlap": 0.4286,
+          "expected": [
+            "动态规划.md"
+          ],
+          "returned": [
+            "动态规划.md",
+            "Python 入门.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "反复问自己同一个问题直到能直接答出来",
+          "grade": "mid",
+          "overlap": 0.2941,
+          "expected": [
+            "递归.md"
+          ],
+          "returned": [
+            "递归.md",
+            "动态规划.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "像食堂打饭那样一个一个来",
+          "grade": "low",
+          "overlap": 0.0,
+          "expected": [
+            "栈与队列.md"
+          ],
+          "returned": [
+            "Python 入门.md",
+            "Python 入门.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "能不能不挨个翻就直接到位",
+          "grade": "low",
+          "overlap": 0.1,
+          "expected": [
+            "哈希表.md"
+          ],
+          "returned": [
+            "递归.md",
+            "动态规划.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "为什么有的整理办法省时间有的费时间",
+          "grade": "low",
+          "overlap": 0.0,
+          "expected": [
+            "排序算法.md"
+          ],
+          "returned": [
+            "哈希表.md",
+            "时间复杂度.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "数据翻一倍要多花多少时间",
+          "grade": "low",
+          "overlap": 0.1818,
+          "expected": [
+            "时间复杂度.md"
+          ],
+          "returned": [
+            "哈希表.md",
+            "时间复杂度.md"
+          ],
+          "hit": 1.0,
+          "rr": 0.5,
+          "recall": 1.0
+        },
+        {
+          "query": "程序跑着跑着突然挂掉是什么原因",
+          "grade": "low",
+          "overlap": 0.1538,
+          "expected": [
+            "递归.md"
+          ],
+          "returned": [
+            "递归.md",
+            "哈希表.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        }
+      ]
+    },
+    {
+      "strategy": "fixed",
+      "mode": "vector",
+      "chunks": 18,
+      "overall": {
+        "hit": 0.5,
+        "mrr": 0.4167,
+        "recall": 0.5,
+        "n": 18
+      },
+      "by_grade": {
+        "high": {
+          "hit": 0.3333,
+          "mrr": 0.25,
+          "recall": 0.3333,
+          "n": 6
+        },
+        "mid": {
+          "hit": 0.8333,
+          "mrr": 0.75,
+          "recall": 0.8333,
+          "n": 6
+        },
+        "low": {
+          "hit": 0.3333,
+          "mrr": 0.25,
+          "recall": 0.3333,
+          "n": 6
+        }
+      },
+      "rows": [
+        {
+          "query": "递归的终止条件是什么",
+          "grade": "high",
+          "overlap": 0.5556,
+          "expected": [
+            "递归.md"
+          ],
+          "returned": [
+            "栈与队列.md",
+            "排序算法.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "二分查找为什么要先排序",
+          "grade": "mid",
+          "overlap": 0.3,
+          "expected": [
+            "二分查找.md"
+          ],
+          "returned": [
+            "二分查找.md",
+            "二分查找.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "Python 的字典和列表有什么区别",
+          "grade": "mid",
+          "overlap": 0.4375,
+          "expected": [
+            "Python 入门.md"
+          ],
+          "returned": [
+            "Python 入门.md",
+            "二分查找.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "栈和队列的存取顺序",
+          "grade": "high",
+          "overlap": 0.5,
+          "expected": [
+            "栈与队列.md"
+          ],
+          "returned": [
+            "哈希表.md",
+            "Python 入门.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "哈希表怎么处理冲突",
+          "grade": "high",
+          "overlap": 0.5,
+          "expected": [
+            "哈希表.md"
+          ],
+          "returned": [
+            "栈与队列.md",
+            "排序算法.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "快速排序最坏情况是什么",
+          "grade": "high",
+          "overlap": 0.6,
+          "expected": [
+            "排序算法.md"
+          ],
+          "returned": [
+            "栈与队列.md",
+            "排序算法.md"
+          ],
+          "hit": 1.0,
+          "rr": 0.5,
+          "recall": 1.0
+        },
+        {
+          "query": "时间复杂度的平方级和线性对数级",
+          "grade": "high",
+          "overlap": 0.7143,
+          "expected": [
+            "时间复杂度.md"
+          ],
+          "returned": [
+            "时间复杂度.md",
+            "排序算法.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "动态规划的记忆化",
+          "grade": "high",
+          "overlap": 0.7143,
+          "expected": [
+            "动态规划.md"
+          ],
+          "returned": [
+            "栈与队列.md",
+            "Python 入门.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "每次只看中间那个数为什么就够了",
+          "grade": "low",
+          "overlap": 0.2143,
+          "expected": [
+            "二分查找.md"
+          ],
+          "returned": [
+            "排序算法.md",
+            "栈与队列.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "怎么用一个名字存一堆相关的东西",
+          "grade": "mid",
+          "overlap": 0.2857,
+          "expected": [
+            "Python 入门.md"
+          ],
+          "returned": [
+            "Python 入门.md",
+            "Python 入门.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "数据本来就差不多有序时会不会变慢",
+          "grade": "mid",
+          "overlap": 0.3333,
+          "expected": [
+            "排序算法.md"
+          ],
+          "returned": [
+            "排序算法.md",
+            "递归.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "算过的结果能不能留着下次直接用",
+          "grade": "mid",
+          "overlap": 0.4286,
+          "expected": [
+            "动态规划.md"
+          ],
+          "returned": [
+            "栈与队列.md",
+            "哈希表.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "反复问自己同一个问题直到能直接答出来",
+          "grade": "mid",
+          "overlap": 0.2941,
+          "expected": [
+            "递归.md"
+          ],
+          "returned": [
+            "栈与队列.md",
+            "递归.md"
+          ],
+          "hit": 1.0,
+          "rr": 0.5,
+          "recall": 1.0
+        },
+        {
+          "query": "像食堂打饭那样一个一个来",
+          "grade": "low",
+          "overlap": 0.0,
+          "expected": [
+            "栈与队列.md"
+          ],
+          "returned": [
+            "Python 入门.md",
+            "递归.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "能不能不挨个翻就直接到位",
+          "grade": "low",
+          "overlap": 0.1,
+          "expected": [
+            "哈希表.md"
+          ],
+          "returned": [
+            "哈希表.md",
+            "栈与队列.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "为什么有的整理办法省时间有的费时间",
+          "grade": "low",
+          "overlap": 0.0,
+          "expected": [
+            "排序算法.md"
+          ],
+          "returned": [
+            "动态规划.md",
+            "排序算法.md"
+          ],
+          "hit": 1.0,
+          "rr": 0.5,
+          "recall": 1.0
+        },
+        {
+          "query": "数据翻一倍要多花多少时间",
+          "grade": "low",
+          "overlap": 0.1818,
+          "expected": [
+            "时间复杂度.md"
+          ],
+          "returned": [
+            "Python 入门.md",
+            "栈与队列.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "程序跑着跑着突然挂掉是什么原因",
+          "grade": "low",
+          "overlap": 0.1538,
+          "expected": [
+            "递归.md"
+          ],
+          "returned": [
+            "排序算法.md",
+            "排序算法.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        }
+      ]
+    },
+    {
+      "strategy": "fixed",
+      "mode": "hybrid",
+      "chunks": 18,
+      "overall": {
+        "hit": 0.8333,
+        "mrr": 0.7778,
+        "recall": 0.8333,
+        "n": 18
+      },
+      "by_grade": {
+        "high": {
+          "hit": 1.0,
+          "mrr": 1.0,
+          "recall": 1.0,
+          "n": 6
+        },
+        "mid": {
+          "hit": 1.0,
+          "mrr": 0.9167,
+          "recall": 1.0,
+          "n": 6
+        },
+        "low": {
+          "hit": 0.5,
+          "mrr": 0.4167,
+          "recall": 0.5,
+          "n": 6
+        }
+      },
+      "rows": [
+        {
+          "query": "递归的终止条件是什么",
+          "grade": "high",
+          "overlap": 0.5556,
+          "expected": [
+            "递归.md"
+          ],
+          "returned": [
+            "递归.md",
+            "栈与队列.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "二分查找为什么要先排序",
+          "grade": "mid",
+          "overlap": 0.3,
+          "expected": [
+            "二分查找.md"
+          ],
+          "returned": [
+            "二分查找.md",
+            "二分查找.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "Python 的字典和列表有什么区别",
+          "grade": "mid",
+          "overlap": 0.4375,
+          "expected": [
+            "Python 入门.md"
+          ],
+          "returned": [
+            "Python 入门.md",
+            "二分查找.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "栈和队列的存取顺序",
+          "grade": "high",
+          "overlap": 0.5,
+          "expected": [
+            "栈与队列.md"
+          ],
+          "returned": [
+            "栈与队列.md",
+            "哈希表.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "哈希表怎么处理冲突",
+          "grade": "high",
+          "overlap": 0.5,
+          "expected": [
+            "哈希表.md"
+          ],
+          "returned": [
+            "哈希表.md",
+            "哈希表.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "快速排序最坏情况是什么",
+          "grade": "high",
+          "overlap": 0.6,
+          "expected": [
+            "排序算法.md"
+          ],
+          "returned": [
+            "排序算法.md",
+            "排序算法.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "时间复杂度的平方级和线性对数级",
+          "grade": "high",
+          "overlap": 0.7143,
+          "expected": [
+            "时间复杂度.md"
+          ],
+          "returned": [
+            "时间复杂度.md",
+            "排序算法.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "动态规划的记忆化",
+          "grade": "high",
+          "overlap": 0.7143,
+          "expected": [
+            "动态规划.md"
+          ],
+          "returned": [
+            "动态规划.md",
+            "栈与队列.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "每次只看中间那个数为什么就够了",
+          "grade": "low",
+          "overlap": 0.2143,
+          "expected": [
+            "二分查找.md"
+          ],
+          "returned": [
+            "二分查找.md",
+            "排序算法.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "怎么用一个名字存一堆相关的东西",
+          "grade": "mid",
+          "overlap": 0.2857,
+          "expected": [
+            "Python 入门.md"
+          ],
+          "returned": [
+            "Python 入门.md",
+            "Python 入门.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "数据本来就差不多有序时会不会变慢",
+          "grade": "mid",
+          "overlap": 0.3333,
+          "expected": [
+            "排序算法.md"
+          ],
+          "returned": [
+            "排序算法.md",
+            "时间复杂度.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "算过的结果能不能留着下次直接用",
+          "grade": "mid",
+          "overlap": 0.4286,
+          "expected": [
+            "动态规划.md"
+          ],
+          "returned": [
+            "Python 入门.md",
+            "动态规划.md"
+          ],
+          "hit": 1.0,
+          "rr": 0.5,
+          "recall": 1.0
+        },
+        {
+          "query": "反复问自己同一个问题直到能直接答出来",
+          "grade": "mid",
+          "overlap": 0.2941,
+          "expected": [
+            "递归.md"
+          ],
+          "returned": [
+            "递归.md",
+            "栈与队列.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "像食堂打饭那样一个一个来",
+          "grade": "low",
+          "overlap": 0.0,
+          "expected": [
+            "栈与队列.md"
+          ],
+          "returned": [
+            "Python 入门.md",
+            "Python 入门.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "能不能不挨个翻就直接到位",
+          "grade": "low",
+          "overlap": 0.1,
+          "expected": [
+            "哈希表.md"
+          ],
+          "returned": [
+            "哈希表.md",
+            "递归.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "为什么有的整理办法省时间有的费时间",
+          "grade": "low",
+          "overlap": 0.0,
+          "expected": [
+            "排序算法.md"
+          ],
+          "returned": [
+            "动态规划.md",
+            "哈希表.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "数据翻一倍要多花多少时间",
+          "grade": "low",
+          "overlap": 0.1818,
+          "expected": [
+            "时间复杂度.md"
+          ],
+          "returned": [
+            "Python 入门.md",
+            "哈希表.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "程序跑着跑着突然挂掉是什么原因",
+          "grade": "low",
+          "overlap": 0.1538,
+          "expected": [
+            "递归.md"
+          ],
+          "returned": [
+            "排序算法.md",
+            "递归.md"
+          ],
+          "hit": 1.0,
+          "rr": 0.5,
+          "recall": 1.0
+        }
+      ]
+    },
+    {
+      "strategy": "recursive",
+      "mode": "keyword",
+      "chunks": 17,
+      "overall": {
+        "hit": 0.7778,
+        "mrr": 0.7222,
+        "recall": 0.7778,
+        "n": 18
+      },
+      "by_grade": {
+        "high": {
+          "hit": 1.0,
+          "mrr": 0.9167,
+          "recall": 1.0,
+          "n": 6
+        },
+        "mid": {
+          "hit": 1.0,
+          "mrr": 1.0,
+          "recall": 1.0,
+          "n": 6
+        },
+        "low": {
+          "hit": 0.3333,
+          "mrr": 0.25,
+          "recall": 0.3333,
+          "n": 6
+        }
+      },
+      "rows": [
+        {
+          "query": "递归的终止条件是什么",
+          "grade": "high",
+          "overlap": 0.5556,
+          "expected": [
+            "递归.md"
+          ],
+          "returned": [
+            "递归.md",
+            "递归.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "二分查找为什么要先排序",
+          "grade": "mid",
+          "overlap": 0.3,
+          "expected": [
+            "二分查找.md"
+          ],
+          "returned": [
+            "二分查找.md",
+            "二分查找.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "Python 的字典和列表有什么区别",
+          "grade": "mid",
+          "overlap": 0.4375,
+          "expected": [
+            "Python 入门.md"
+          ],
+          "returned": [
+            "Python 入门.md",
+            "动态规划.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "栈和队列的存取顺序",
+          "grade": "high",
+          "overlap": 0.5,
+          "expected": [
+            "栈与队列.md"
+          ],
+          "returned": [
+            "栈与队列.md",
+            "栈与队列.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "哈希表怎么处理冲突",
+          "grade": "high",
+          "overlap": 0.5,
+          "expected": [
+            "哈希表.md"
+          ],
+          "returned": [
+            "哈希表.md",
+            "哈希表.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "快速排序最坏情况是什么",
+          "grade": "high",
+          "overlap": 0.6,
+          "expected": [
+            "排序算法.md"
+          ],
+          "returned": [
+            "排序算法.md",
+            "排序算法.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "时间复杂度的平方级和线性对数级",
+          "grade": "high",
+          "overlap": 0.7143,
+          "expected": [
+            "时间复杂度.md"
+          ],
+          "returned": [
+            "排序算法.md",
+            "时间复杂度.md"
+          ],
+          "hit": 1.0,
+          "rr": 0.5,
+          "recall": 1.0
+        },
+        {
+          "query": "动态规划的记忆化",
+          "grade": "high",
+          "overlap": 0.7143,
+          "expected": [
+            "动态规划.md"
+          ],
+          "returned": [
+            "动态规划.md",
+            "动态规划.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "每次只看中间那个数为什么就够了",
+          "grade": "low",
+          "overlap": 0.2143,
+          "expected": [
+            "二分查找.md"
+          ],
+          "returned": [
+            "二分查找.md",
+            "二分查找.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "怎么用一个名字存一堆相关的东西",
+          "grade": "mid",
+          "overlap": 0.2857,
+          "expected": [
+            "Python 入门.md"
+          ],
+          "returned": [
+            "Python 入门.md",
+            "Python 入门.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "数据本来就差不多有序时会不会变慢",
+          "grade": "mid",
+          "overlap": 0.3333,
+          "expected": [
+            "排序算法.md"
+          ],
+          "returned": [
+            "排序算法.md",
+            "排序算法.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "算过的结果能不能留着下次直接用",
+          "grade": "mid",
+          "overlap": 0.4286,
+          "expected": [
+            "动态规划.md"
+          ],
+          "returned": [
+            "动态规划.md",
+            "Python 入门.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "反复问自己同一个问题直到能直接答出来",
+          "grade": "mid",
+          "overlap": 0.2941,
+          "expected": [
+            "递归.md"
+          ],
+          "returned": [
+            "递归.md",
+            "递归.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "像食堂打饭那样一个一个来",
+          "grade": "low",
+          "overlap": 0.0,
+          "expected": [
+            "栈与队列.md"
+          ],
+          "returned": [
+            "Python 入门.md",
+            "Python 入门.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "能不能不挨个翻就直接到位",
+          "grade": "low",
+          "overlap": 0.1,
+          "expected": [
+            "哈希表.md"
+          ],
+          "returned": [
+            "递归.md",
+            "动态规划.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "为什么有的整理办法省时间有的费时间",
+          "grade": "low",
+          "overlap": 0.0,
+          "expected": [
+            "排序算法.md"
+          ],
+          "returned": [
+            "哈希表.md",
+            "时间复杂度.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "数据翻一倍要多花多少时间",
+          "grade": "low",
+          "overlap": 0.1818,
+          "expected": [
+            "时间复杂度.md"
+          ],
+          "returned": [
+            "哈希表.md",
+            "时间复杂度.md"
+          ],
+          "hit": 1.0,
+          "rr": 0.5,
+          "recall": 1.0
+        },
+        {
+          "query": "程序跑着跑着突然挂掉是什么原因",
+          "grade": "low",
+          "overlap": 0.1538,
+          "expected": [
+            "递归.md"
+          ],
+          "returned": [
+            "哈希表.md",
+            "时间复杂度.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        }
+      ]
+    },
+    {
+      "strategy": "recursive",
+      "mode": "vector",
+      "chunks": 17,
+      "overall": {
+        "hit": 0.4444,
+        "mrr": 0.3611,
+        "recall": 0.4444,
+        "n": 18
+      },
+      "by_grade": {
+        "high": {
+          "hit": 0.5,
+          "mrr": 0.3333,
+          "recall": 0.5,
+          "n": 6
+        },
+        "mid": {
+          "hit": 0.5,
+          "mrr": 0.5,
+          "recall": 0.5,
+          "n": 6
+        },
+        "low": {
+          "hit": 0.3333,
+          "mrr": 0.25,
+          "recall": 0.3333,
+          "n": 6
+        }
+      },
+      "rows": [
+        {
+          "query": "递归的终止条件是什么",
+          "grade": "high",
+          "overlap": 0.5556,
+          "expected": [
+            "递归.md"
+          ],
+          "returned": [
+            "递归.md",
+            "排序算法.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "二分查找为什么要先排序",
+          "grade": "mid",
+          "overlap": 0.3,
+          "expected": [
+            "二分查找.md"
+          ],
+          "returned": [
+            "二分查找.md",
+            "二分查找.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "Python 的字典和列表有什么区别",
+          "grade": "mid",
+          "overlap": 0.4375,
+          "expected": [
+            "Python 入门.md"
+          ],
+          "returned": [
+            "Python 入门.md",
+            "Python 入门.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "栈和队列的存取顺序",
+          "grade": "high",
+          "overlap": 0.5,
+          "expected": [
+            "栈与队列.md"
+          ],
+          "returned": [
+            "时间复杂度.md",
+            "排序算法.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "哈希表怎么处理冲突",
+          "grade": "high",
+          "overlap": 0.5,
+          "expected": [
+            "哈希表.md"
+          ],
+          "returned": [
+            "时间复杂度.md",
+            "排序算法.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "快速排序最坏情况是什么",
+          "grade": "high",
+          "overlap": 0.6,
+          "expected": [
+            "排序算法.md"
+          ],
+          "returned": [
+            "时间复杂度.md",
+            "排序算法.md"
+          ],
+          "hit": 1.0,
+          "rr": 0.5,
+          "recall": 1.0
+        },
+        {
+          "query": "时间复杂度的平方级和线性对数级",
+          "grade": "high",
+          "overlap": 0.7143,
+          "expected": [
+            "时间复杂度.md"
+          ],
+          "returned": [
+            "排序算法.md",
+            "时间复杂度.md"
+          ],
+          "hit": 1.0,
+          "rr": 0.5,
+          "recall": 1.0
+        },
+        {
+          "query": "动态规划的记忆化",
+          "grade": "high",
+          "overlap": 0.7143,
+          "expected": [
+            "动态规划.md"
+          ],
+          "returned": [
+            "时间复杂度.md",
+            "排序算法.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "每次只看中间那个数为什么就够了",
+          "grade": "low",
+          "overlap": 0.2143,
+          "expected": [
+            "二分查找.md"
+          ],
+          "returned": [
+            "排序算法.md",
+            "时间复杂度.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "怎么用一个名字存一堆相关的东西",
+          "grade": "mid",
+          "overlap": 0.2857,
+          "expected": [
+            "Python 入门.md"
+          ],
+          "returned": [
+            "Python 入门.md",
+            "Python 入门.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "数据本来就差不多有序时会不会变慢",
+          "grade": "mid",
+          "overlap": 0.3333,
+          "expected": [
+            "排序算法.md"
+          ],
+          "returned": [
+            "递归.md",
+            "Python 入门.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "算过的结果能不能留着下次直接用",
+          "grade": "mid",
+          "overlap": 0.4286,
+          "expected": [
+            "动态规划.md"
+          ],
+          "returned": [
+            "时间复杂度.md",
+            "排序算法.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "反复问自己同一个问题直到能直接答出来",
+          "grade": "mid",
+          "overlap": 0.2941,
+          "expected": [
+            "递归.md"
+          ],
+          "returned": [
+            "栈与队列.md",
+            "栈与队列.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "像食堂打饭那样一个一个来",
+          "grade": "low",
+          "overlap": 0.0,
+          "expected": [
+            "栈与队列.md"
+          ],
+          "returned": [
+            "哈希表.md",
+            "Python 入门.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "能不能不挨个翻就直接到位",
+          "grade": "low",
+          "overlap": 0.1,
+          "expected": [
+            "哈希表.md"
+          ],
+          "returned": [
+            "时间复杂度.md",
+            "哈希表.md"
+          ],
+          "hit": 1.0,
+          "rr": 0.5,
+          "recall": 1.0
+        },
+        {
+          "query": "为什么有的整理办法省时间有的费时间",
+          "grade": "low",
+          "overlap": 0.0,
+          "expected": [
+            "排序算法.md"
+          ],
+          "returned": [
+            "排序算法.md",
+            "时间复杂度.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "数据翻一倍要多花多少时间",
+          "grade": "low",
+          "overlap": 0.1818,
+          "expected": [
+            "时间复杂度.md"
+          ],
+          "returned": [
+            "Python 入门.md",
+            "栈与队列.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "程序跑着跑着突然挂掉是什么原因",
+          "grade": "low",
+          "overlap": 0.1538,
+          "expected": [
+            "递归.md"
+          ],
+          "returned": [
+            "排序算法.md",
+            "二分查找.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        }
+      ]
+    },
+    {
+      "strategy": "recursive",
+      "mode": "hybrid",
+      "chunks": 17,
+      "overall": {
+        "hit": 0.7222,
+        "mrr": 0.6389,
+        "recall": 0.7222,
+        "n": 18
+      },
+      "by_grade": {
+        "high": {
+          "hit": 1.0,
+          "mrr": 0.75,
+          "recall": 1.0,
+          "n": 6
+        },
+        "mid": {
+          "hit": 1.0,
+          "mrr": 1.0,
+          "recall": 1.0,
+          "n": 6
+        },
+        "low": {
+          "hit": 0.1667,
+          "mrr": 0.1667,
+          "recall": 0.1667,
+          "n": 6
+        }
+      },
+      "rows": [
+        {
+          "query": "递归的终止条件是什么",
+          "grade": "high",
+          "overlap": 0.5556,
+          "expected": [
+            "递归.md"
+          ],
+          "returned": [
+            "递归.md",
+            "排序算法.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "二分查找为什么要先排序",
+          "grade": "mid",
+          "overlap": 0.3,
+          "expected": [
+            "二分查找.md"
+          ],
+          "returned": [
+            "二分查找.md",
+            "二分查找.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "Python 的字典和列表有什么区别",
+          "grade": "mid",
+          "overlap": 0.4375,
+          "expected": [
+            "Python 入门.md"
+          ],
+          "returned": [
+            "Python 入门.md",
+            "Python 入门.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "栈和队列的存取顺序",
+          "grade": "high",
+          "overlap": 0.5,
+          "expected": [
+            "栈与队列.md"
+          ],
+          "returned": [
+            "时间复杂度.md",
+            "栈与队列.md"
+          ],
+          "hit": 1.0,
+          "rr": 0.5,
+          "recall": 1.0
+        },
+        {
+          "query": "哈希表怎么处理冲突",
+          "grade": "high",
+          "overlap": 0.5,
+          "expected": [
+            "哈希表.md"
+          ],
+          "returned": [
+            "哈希表.md",
+            "时间复杂度.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "快速排序最坏情况是什么",
+          "grade": "high",
+          "overlap": 0.6,
+          "expected": [
+            "排序算法.md"
+          ],
+          "returned": [
+            "时间复杂度.md",
+            "排序算法.md"
+          ],
+          "hit": 1.0,
+          "rr": 0.5,
+          "recall": 1.0
+        },
+        {
+          "query": "时间复杂度的平方级和线性对数级",
+          "grade": "high",
+          "overlap": 0.7143,
+          "expected": [
+            "时间复杂度.md"
+          ],
+          "returned": [
+            "排序算法.md",
+            "时间复杂度.md"
+          ],
+          "hit": 1.0,
+          "rr": 0.5,
+          "recall": 1.0
+        },
+        {
+          "query": "动态规划的记忆化",
+          "grade": "high",
+          "overlap": 0.7143,
+          "expected": [
+            "动态规划.md"
+          ],
+          "returned": [
+            "动态规划.md",
+            "时间复杂度.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "每次只看中间那个数为什么就够了",
+          "grade": "low",
+          "overlap": 0.2143,
+          "expected": [
+            "二分查找.md"
+          ],
+          "returned": [
+            "二分查找.md",
+            "二分查找.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "怎么用一个名字存一堆相关的东西",
+          "grade": "mid",
+          "overlap": 0.2857,
+          "expected": [
+            "Python 入门.md"
+          ],
+          "returned": [
+            "Python 入门.md",
+            "Python 入门.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "数据本来就差不多有序时会不会变慢",
+          "grade": "mid",
+          "overlap": 0.3333,
+          "expected": [
+            "排序算法.md"
+          ],
+          "returned": [
+            "排序算法.md",
+            "递归.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "算过的结果能不能留着下次直接用",
+          "grade": "mid",
+          "overlap": 0.4286,
+          "expected": [
+            "动态规划.md"
+          ],
+          "returned": [
+            "动态规划.md",
+            "时间复杂度.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "反复问自己同一个问题直到能直接答出来",
+          "grade": "mid",
+          "overlap": 0.2941,
+          "expected": [
+            "递归.md"
+          ],
+          "returned": [
+            "递归.md",
+            "栈与队列.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "像食堂打饭那样一个一个来",
+          "grade": "low",
+          "overlap": 0.0,
+          "expected": [
+            "栈与队列.md"
+          ],
+          "returned": [
+            "Python 入门.md",
+            "Python 入门.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "能不能不挨个翻就直接到位",
+          "grade": "low",
+          "overlap": 0.1,
+          "expected": [
+            "哈希表.md"
+          ],
+          "returned": [
+            "时间复杂度.md",
+            "递归.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "为什么有的整理办法省时间有的费时间",
+          "grade": "low",
+          "overlap": 0.0,
+          "expected": [
+            "排序算法.md"
+          ],
+          "returned": [
+            "哈希表.md",
+            "时间复杂度.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "数据翻一倍要多花多少时间",
+          "grade": "low",
+          "overlap": 0.1818,
+          "expected": [
+            "时间复杂度.md"
+          ],
+          "returned": [
+            "哈希表.md",
+            "Python 入门.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "程序跑着跑着突然挂掉是什么原因",
+          "grade": "low",
+          "overlap": 0.1538,
+          "expected": [
+            "递归.md"
+          ],
+          "returned": [
+            "哈希表.md",
+            "排序算法.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        }
+      ]
+    },
+    {
+      "strategy": "semantic",
+      "mode": "keyword",
+      "chunks": 28,
+      "overall": {
+        "hit": 0.8333,
+        "mrr": 0.7778,
+        "recall": 0.8333,
+        "n": 18
+      },
+      "by_grade": {
+        "high": {
+          "hit": 1.0,
+          "mrr": 0.9167,
+          "recall": 1.0,
+          "n": 6
+        },
+        "mid": {
+          "hit": 1.0,
+          "mrr": 1.0,
+          "recall": 1.0,
+          "n": 6
+        },
+        "low": {
+          "hit": 0.5,
+          "mrr": 0.4167,
+          "recall": 0.5,
+          "n": 6
+        }
+      },
+      "rows": [
+        {
+          "query": "递归的终止条件是什么",
+          "grade": "high",
+          "overlap": 0.5556,
+          "expected": [
+            "递归.md"
+          ],
+          "returned": [
+            "递归.md",
+            "二分查找.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "二分查找为什么要先排序",
+          "grade": "mid",
+          "overlap": 0.3,
+          "expected": [
+            "二分查找.md"
+          ],
+          "returned": [
+            "二分查找.md",
+            "二分查找.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "Python 的字典和列表有什么区别",
+          "grade": "mid",
+          "overlap": 0.4375,
+          "expected": [
+            "Python 入门.md"
+          ],
+          "returned": [
+            "Python 入门.md",
+            "动态规划.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "栈和队列的存取顺序",
+          "grade": "high",
+          "overlap": 0.5,
+          "expected": [
+            "栈与队列.md"
+          ],
+          "returned": [
+            "栈与队列.md",
+            "栈与队列.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "哈希表怎么处理冲突",
+          "grade": "high",
+          "overlap": 0.5,
+          "expected": [
+            "哈希表.md"
+          ],
+          "returned": [
+            "哈希表.md",
+            "二分查找.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "快速排序最坏情况是什么",
+          "grade": "high",
+          "overlap": 0.6,
+          "expected": [
+            "排序算法.md"
+          ],
+          "returned": [
+            "排序算法.md",
+            "排序算法.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "时间复杂度的平方级和线性对数级",
+          "grade": "high",
+          "overlap": 0.7143,
+          "expected": [
+            "时间复杂度.md"
+          ],
+          "returned": [
+            "排序算法.md",
+            "时间复杂度.md"
+          ],
+          "hit": 1.0,
+          "rr": 0.5,
+          "recall": 1.0
+        },
+        {
+          "query": "动态规划的记忆化",
+          "grade": "high",
+          "overlap": 0.7143,
+          "expected": [
+            "动态规划.md"
+          ],
+          "returned": [
+            "动态规划.md",
+            "栈与队列.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "每次只看中间那个数为什么就够了",
+          "grade": "low",
+          "overlap": 0.2143,
+          "expected": [
+            "二分查找.md"
+          ],
+          "returned": [
+            "二分查找.md",
+            "二分查找.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "怎么用一个名字存一堆相关的东西",
+          "grade": "mid",
+          "overlap": 0.2857,
+          "expected": [
+            "Python 入门.md"
+          ],
+          "returned": [
+            "Python 入门.md",
+            "Python 入门.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "数据本来就差不多有序时会不会变慢",
+          "grade": "mid",
+          "overlap": 0.3333,
+          "expected": [
+            "排序算法.md"
+          ],
+          "returned": [
+            "排序算法.md",
+            "时间复杂度.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "算过的结果能不能留着下次直接用",
+          "grade": "mid",
+          "overlap": 0.4286,
+          "expected": [
+            "动态规划.md"
+          ],
+          "returned": [
+            "动态规划.md",
+            "Python 入门.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "反复问自己同一个问题直到能直接答出来",
+          "grade": "mid",
+          "overlap": 0.2941,
+          "expected": [
+            "递归.md"
+          ],
+          "returned": [
+            "递归.md",
+            "动态规划.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "像食堂打饭那样一个一个来",
+          "grade": "low",
+          "overlap": 0.0,
+          "expected": [
+            "栈与队列.md"
+          ],
+          "returned": [
+            "Python 入门.md",
+            "哈希表.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "能不能不挨个翻就直接到位",
+          "grade": "low",
+          "overlap": 0.1,
+          "expected": [
+            "哈希表.md"
+          ],
+          "returned": [
+            "递归.md",
+            "动态规划.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "为什么有的整理办法省时间有的费时间",
+          "grade": "low",
+          "overlap": 0.0,
+          "expected": [
+            "排序算法.md"
+          ],
+          "returned": [
+            "哈希表.md",
+            "时间复杂度.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "数据翻一倍要多花多少时间",
+          "grade": "low",
+          "overlap": 0.1818,
+          "expected": [
+            "时间复杂度.md"
+          ],
+          "returned": [
+            "哈希表.md",
+            "时间复杂度.md"
+          ],
+          "hit": 1.0,
+          "rr": 0.5,
+          "recall": 1.0
+        },
+        {
+          "query": "程序跑着跑着突然挂掉是什么原因",
+          "grade": "low",
+          "overlap": 0.1538,
+          "expected": [
+            "递归.md"
+          ],
+          "returned": [
+            "递归.md",
+            "哈希表.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        }
+      ]
+    },
+    {
+      "strategy": "semantic",
+      "mode": "vector",
+      "chunks": 28,
+      "overall": {
+        "hit": 0.3333,
+        "mrr": 0.2778,
+        "recall": 0.3333,
+        "n": 18
+      },
+      "by_grade": {
+        "high": {
+          "hit": 0.0,
+          "mrr": 0.0,
+          "recall": 0.0,
+          "n": 6
+        },
+        "mid": {
+          "hit": 0.5,
+          "mrr": 0.5,
+          "recall": 0.5,
+          "n": 6
+        },
+        "low": {
+          "hit": 0.5,
+          "mrr": 0.3333,
+          "recall": 0.5,
+          "n": 6
+        }
+      },
+      "rows": [
+        {
+          "query": "递归的终止条件是什么",
+          "grade": "high",
+          "overlap": 0.5556,
+          "expected": [
+            "递归.md"
+          ],
+          "returned": [
+            "排序算法.md",
+            "Python 入门.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "二分查找为什么要先排序",
+          "grade": "mid",
+          "overlap": 0.3,
+          "expected": [
+            "二分查找.md"
+          ],
+          "returned": [
+            "二分查找.md",
+            "二分查找.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "Python 的字典和列表有什么区别",
+          "grade": "mid",
+          "overlap": 0.4375,
+          "expected": [
+            "Python 入门.md"
+          ],
+          "returned": [
+            "Python 入门.md",
+            "栈与队列.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "栈和队列的存取顺序",
+          "grade": "high",
+          "overlap": 0.5,
+          "expected": [
+            "栈与队列.md"
+          ],
+          "returned": [
+            "排序算法.md",
+            "Python 入门.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "哈希表怎么处理冲突",
+          "grade": "high",
+          "overlap": 0.5,
+          "expected": [
+            "哈希表.md"
+          ],
+          "returned": [
+            "时间复杂度.md",
+            "时间复杂度.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "快速排序最坏情况是什么",
+          "grade": "high",
+          "overlap": 0.6,
+          "expected": [
+            "排序算法.md"
+          ],
+          "returned": [
+            "时间复杂度.md",
+            "时间复杂度.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "时间复杂度的平方级和线性对数级",
+          "grade": "high",
+          "overlap": 0.7143,
+          "expected": [
+            "时间复杂度.md"
+          ],
+          "returned": [
+            "排序算法.md",
+            "Python 入门.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "动态规划的记忆化",
+          "grade": "high",
+          "overlap": 0.7143,
+          "expected": [
+            "动态规划.md"
+          ],
+          "returned": [
+            "排序算法.md",
+            "Python 入门.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "每次只看中间那个数为什么就够了",
+          "grade": "low",
+          "overlap": 0.2143,
+          "expected": [
+            "二分查找.md"
+          ],
+          "returned": [
+            "排序算法.md",
+            "栈与队列.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "怎么用一个名字存一堆相关的东西",
+          "grade": "mid",
+          "overlap": 0.2857,
+          "expected": [
+            "Python 入门.md"
+          ],
+          "returned": [
+            "Python 入门.md",
+            "Python 入门.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "数据本来就差不多有序时会不会变慢",
+          "grade": "mid",
+          "overlap": 0.3333,
+          "expected": [
+            "排序算法.md"
+          ],
+          "returned": [
+            "递归.md",
+            "哈希表.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "算过的结果能不能留着下次直接用",
+          "grade": "mid",
+          "overlap": 0.4286,
+          "expected": [
+            "动态规划.md"
+          ],
+          "returned": [
+            "排序算法.md",
+            "时间复杂度.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "反复问自己同一个问题直到能直接答出来",
+          "grade": "mid",
+          "overlap": 0.2941,
+          "expected": [
+            "递归.md"
+          ],
+          "returned": [
+            "二分查找.md",
+            "栈与队列.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "像食堂打饭那样一个一个来",
+          "grade": "low",
+          "overlap": 0.0,
+          "expected": [
+            "栈与队列.md"
+          ],
+          "returned": [
+            "栈与队列.md",
+            "动态规划.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "能不能不挨个翻就直接到位",
+          "grade": "low",
+          "overlap": 0.1,
+          "expected": [
+            "哈希表.md"
+          ],
+          "returned": [
+            "时间复杂度.md",
+            "哈希表.md"
+          ],
+          "hit": 1.0,
+          "rr": 0.5,
+          "recall": 1.0
+        },
+        {
+          "query": "为什么有的整理办法省时间有的费时间",
+          "grade": "low",
+          "overlap": 0.0,
+          "expected": [
+            "排序算法.md"
+          ],
+          "returned": [
+            "动态规划.md",
+            "时间复杂度.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "数据翻一倍要多花多少时间",
+          "grade": "low",
+          "overlap": 0.1818,
+          "expected": [
+            "时间复杂度.md"
+          ],
+          "returned": [
+            "动态规划.md",
+            "栈与队列.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "程序跑着跑着突然挂掉是什么原因",
+          "grade": "low",
+          "overlap": 0.1538,
+          "expected": [
+            "递归.md"
+          ],
+          "returned": [
+            "排序算法.md",
+            "递归.md"
+          ],
+          "hit": 1.0,
+          "rr": 0.5,
+          "recall": 1.0
+        }
+      ]
+    },
+    {
+      "strategy": "semantic",
+      "mode": "hybrid",
+      "chunks": 28,
+      "overall": {
+        "hit": 0.7778,
+        "mrr": 0.5833,
+        "recall": 0.7778,
+        "n": 18
+      },
+      "by_grade": {
+        "high": {
+          "hit": 0.8333,
+          "mrr": 0.5833,
+          "recall": 0.8333,
+          "n": 6
+        },
+        "mid": {
+          "hit": 1.0,
+          "mrr": 0.9167,
+          "recall": 1.0,
+          "n": 6
+        },
+        "low": {
+          "hit": 0.5,
+          "mrr": 0.25,
+          "recall": 0.5,
+          "n": 6
+        }
+      },
+      "rows": [
+        {
+          "query": "递归的终止条件是什么",
+          "grade": "high",
+          "overlap": 0.5556,
+          "expected": [
+            "递归.md"
+          ],
+          "returned": [
+            "排序算法.md",
+            "递归.md"
+          ],
+          "hit": 1.0,
+          "rr": 0.5,
+          "recall": 1.0
+        },
+        {
+          "query": "二分查找为什么要先排序",
+          "grade": "mid",
+          "overlap": 0.3,
+          "expected": [
+            "二分查找.md"
+          ],
+          "returned": [
+            "二分查找.md",
+            "二分查找.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "Python 的字典和列表有什么区别",
+          "grade": "mid",
+          "overlap": 0.4375,
+          "expected": [
+            "Python 入门.md"
+          ],
+          "returned": [
+            "Python 入门.md",
+            "动态规划.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "栈和队列的存取顺序",
+          "grade": "high",
+          "overlap": 0.5,
+          "expected": [
+            "栈与队列.md"
+          ],
+          "returned": [
+            "排序算法.md",
+            "栈与队列.md"
+          ],
+          "hit": 1.0,
+          "rr": 0.5,
+          "recall": 1.0
+        },
+        {
+          "query": "哈希表怎么处理冲突",
+          "grade": "high",
+          "overlap": 0.5,
+          "expected": [
+            "哈希表.md"
+          ],
+          "returned": [
+            "哈希表.md",
+            "时间复杂度.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "快速排序最坏情况是什么",
+          "grade": "high",
+          "overlap": 0.6,
+          "expected": [
+            "排序算法.md"
+          ],
+          "returned": [
+            "时间复杂度.md",
+            "排序算法.md"
+          ],
+          "hit": 1.0,
+          "rr": 0.5,
+          "recall": 1.0
+        },
+        {
+          "query": "时间复杂度的平方级和线性对数级",
+          "grade": "high",
+          "overlap": 0.7143,
+          "expected": [
+            "时间复杂度.md"
+          ],
+          "returned": [
+            "排序算法.md",
+            "排序算法.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "动态规划的记忆化",
+          "grade": "high",
+          "overlap": 0.7143,
+          "expected": [
+            "动态规划.md"
+          ],
+          "returned": [
+            "动态规划.md",
+            "排序算法.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "每次只看中间那个数为什么就够了",
+          "grade": "low",
+          "overlap": 0.2143,
+          "expected": [
+            "二分查找.md"
+          ],
+          "returned": [
+            "排序算法.md",
+            "二分查找.md"
+          ],
+          "hit": 1.0,
+          "rr": 0.5,
+          "recall": 1.0
+        },
+        {
+          "query": "怎么用一个名字存一堆相关的东西",
+          "grade": "mid",
+          "overlap": 0.2857,
+          "expected": [
+            "Python 入门.md"
+          ],
+          "returned": [
+            "Python 入门.md",
+            "Python 入门.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "数据本来就差不多有序时会不会变慢",
+          "grade": "mid",
+          "overlap": 0.3333,
+          "expected": [
+            "排序算法.md"
+          ],
+          "returned": [
+            "排序算法.md",
+            "递归.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "算过的结果能不能留着下次直接用",
+          "grade": "mid",
+          "overlap": 0.4286,
+          "expected": [
+            "动态规划.md"
+          ],
+          "returned": [
+            "Python 入门.md",
+            "动态规划.md"
+          ],
+          "hit": 1.0,
+          "rr": 0.5,
+          "recall": 1.0
+        },
+        {
+          "query": "反复问自己同一个问题直到能直接答出来",
+          "grade": "mid",
+          "overlap": 0.2941,
+          "expected": [
+            "递归.md"
+          ],
+          "returned": [
+            "递归.md",
+            "二分查找.md"
+          ],
+          "hit": 1.0,
+          "rr": 1.0,
+          "recall": 1.0
+        },
+        {
+          "query": "像食堂打饭那样一个一个来",
+          "grade": "low",
+          "overlap": 0.0,
+          "expected": [
+            "栈与队列.md"
+          ],
+          "returned": [
+            "Python 入门.md",
+            "栈与队列.md"
+          ],
+          "hit": 1.0,
+          "rr": 0.5,
+          "recall": 1.0
+        },
+        {
+          "query": "能不能不挨个翻就直接到位",
+          "grade": "low",
+          "overlap": 0.1,
+          "expected": [
+            "哈希表.md"
+          ],
+          "returned": [
+            "时间复杂度.md",
+            "递归.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "为什么有的整理办法省时间有的费时间",
+          "grade": "low",
+          "overlap": 0.0,
+          "expected": [
+            "排序算法.md"
+          ],
+          "returned": [
+            "动态规划.md",
+            "哈希表.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "数据翻一倍要多花多少时间",
+          "grade": "low",
+          "overlap": 0.1818,
+          "expected": [
+            "时间复杂度.md"
+          ],
+          "returned": [
+            "哈希表.md",
+            "动态规划.md"
+          ],
+          "hit": 0.0,
+          "rr": 0.0,
+          "recall": 0.0
+        },
+        {
+          "query": "程序跑着跑着突然挂掉是什么原因",
+          "grade": "low",
+          "overlap": 0.1538,
+          "expected": [
+            "递归.md"
+          ],
+          "returned": [
+            "排序算法.md",
+            "递归.md"
+          ],
+          "hit": 1.0,
+          "rr": 0.5,
+          "recall": 1.0
+        }
+      ]
+    }
+  ]
+}

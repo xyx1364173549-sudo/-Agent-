@@ -12,6 +12,7 @@
 from __future__ import annotations
 
 import sqlite3
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import pytest
@@ -20,6 +21,7 @@ from src.memory.store import SCHEMA_VERSION, get_connection
 from src.planning.profile import (
     LEARNING_RATE,
     MASTERED_THRESHOLD,
+    MASTERY_HALF_LIFE_DAYS,
     WEAK_THRESHOLD,
     LearnerProfile,
 )
@@ -217,6 +219,133 @@ def test_forget_topic(graded: LearnerProfile) -> None:
     assert graded.mastery_of("动态规划") == 0.0
     # 第二次删就删不到了，返回值如实反映
     assert graded.forget_topic("动态规划") is False
+
+
+# --------------------------------------------------------------------------
+# 时间衰减：学过的东西不练会忘
+# --------------------------------------------------------------------------
+
+
+@pytest.fixture
+def clocked(tmp_path: Path):
+    """一个时间可控的画像，用来验证「过了一个月会掉多少」。
+
+    不注入时钟的话，想验证衰减就得真等一个月——这种测试没人会去跑第二遍。
+    """
+    current = [datetime(2026, 1, 1, 12, 0, 0)]
+    profile = LearnerProfile(
+        "student-1",
+        db_path=tmp_path / "clocked.db",
+        clock=lambda: current[0],
+    )
+    yield profile, current
+    profile.close()
+
+
+def test_fresh_mastery_is_not_decayed(clocked) -> None:
+    """刚练完不衰减。"""
+    profile, _ = clocked
+    profile.set_mastery("递归", 0.8)
+
+    assert profile.mastery_of("递归") == 0.8
+
+
+def test_mastery_halves_after_one_half_life(clocked) -> None:
+    profile, current = clocked
+    profile.set_mastery("递归", 0.8)
+
+    current[0] = current[0] + timedelta(days=MASTERY_HALF_LIFE_DAYS)
+
+    assert profile.mastery_of("递归") == pytest.approx(0.4, abs=1e-3)
+
+
+def test_mastery_quarters_after_two_half_lives(clocked) -> None:
+    profile, current = clocked
+    profile.set_mastery("递归", 0.8)
+
+    current[0] = current[0] + timedelta(days=MASTERY_HALF_LIFE_DAYS * 2)
+
+    assert profile.mastery_of("递归") == pytest.approx(0.2, abs=1e-3)
+
+
+def test_repeated_reads_do_not_accumulate(clocked) -> None:
+    """同一天读一百次，结果必须完全一样。
+
+    这条盯着一个很容易写错的做法：把衰减后的值写回数据库。
+    那样读得越勤掉得越快，而且每读一次数据就变一次，
+    排查起来会以为是「随机」问题。
+    """
+    profile, current = clocked
+    profile.set_mastery("递归", 0.8)
+    current[0] = current[0] + timedelta(days=15)
+
+    first = profile.mastery_of("递归")
+    for _ in range(20):
+        profile.mastery_of("递归")
+    assert profile.mastery_of("递归") == first
+
+
+def test_future_timestamp_is_not_decayed(clocked) -> None:
+    """时间戳在未来时不打折。
+
+    时钟回拨、或者手工改过数据都可能造成这种情况。
+    宁可高估水平，也不能凭一个坏时间戳把用户的掌握度抹掉。
+    """
+    profile, current = clocked
+    profile.set_mastery("递归", 0.8)
+    current[0] = current[0] - timedelta(days=30)
+
+    assert profile.mastery_of("递归") == 0.8
+
+
+def test_practicing_again_restores_mastery(clocked) -> None:
+    """忘掉之后重新练，掌握度是往上走的。
+
+    更新时要基于**衰减后**的当前值算，而不是库里那个旧值——
+    基于旧值算的话，一个已经掉到 0.4 的知识点会直接从 0.8 往上加，
+    相当于「假装没忘过」。
+    """
+    profile, current = clocked
+    profile.set_mastery("递归", 0.8)
+    current[0] = current[0] + timedelta(days=MASTERY_HALF_LIFE_DAYS * 2)
+
+    assert profile.mastery_of("递归") == pytest.approx(0.2, abs=1e-3)
+
+    profile.record_attempt("递归", correct=True)
+
+    # 0.2 × 0.7 + 1.0 × 0.3 = 0.44
+    assert profile.mastery_of("递归") == pytest.approx(0.44, abs=1e-3)
+
+
+def test_all_topics_sorted_by_decayed_value(clocked) -> None:
+    """排序要按**现在**的掌握度，不能按练习时的旧值。
+
+    反例很清楚：三个月前练到 0.9 的点按旧值排最后，但它现在可能只剩 0.3，
+    恰恰是最该补的。
+    """
+    profile, current = clocked
+    profile.set_mastery("很久以前练的", 0.9)
+    current[0] = current[0] + timedelta(days=MASTERY_HALF_LIFE_DAYS * 3)
+    profile.set_mastery("刚练的", 0.5)
+
+    order = [item["topic"] for item in profile.all_topics()]
+
+    assert order == ["很久以前练的", "刚练的"]
+
+
+def test_decay_makes_mastered_topic_weak_again(clocked) -> None:
+    """衰减之后，原本「已掌握」的知识点会重新变成「待加强」。
+
+    这正是规划器能回头的依据：画像看得见它掉下来了。
+    """
+    profile, current = clocked
+    profile.set_mastery("递归", 0.8)
+    assert profile.mastered_topics() == ["递归"]
+
+    current[0] = current[0] + timedelta(days=MASTERY_HALF_LIFE_DAYS * 2)
+
+    assert profile.mastered_topics() == []
+    assert [item["topic"] for item in profile.weak_topics()] == ["递归"]
 
 
 # --------------------------------------------------------------------------

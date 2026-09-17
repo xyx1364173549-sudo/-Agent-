@@ -24,13 +24,29 @@
 学习者水平的真实变化方式。
 
 典型数值：连续答对 0.00 → 0.30 → 0.51 → 0.66 → 0.76 → 0.83 → 0.88…
+
+## 掌握度会随时间衰减
+
+存进库里的值是**练习当时**的水平，读出来时要按过了多久打个折——
+学过的东西不练是会忘的。
+
+这个设计是实验三逼出来的：第一版画像永不衰减，仿真跑出来的结果
+完全反了——**动态规划比静态课表还差**。原因很清楚：三个月前练到
+0.8 的知识点，画像一直显示 0.8，规划器就再也不安排它了；可学生的
+真实水平早掉下去了。于是系统骄傲地略过最需要复习的地方。
+
+加上时间衰减之后，规划器能看到「这个点掉下来了」，才会回头补。
+数据库里存的仍是原始值，衰减只在**读取时**算——每次查询重新算一遍，
+不会因为反复读写而累积误差。
 """
 
 import math
 import sqlite3
+from collections.abc import Callable
+from datetime import datetime
 from pathlib import Path
 
-from src.memory.store import get_connection, now_iso
+from src.memory.store import get_connection
 
 # 指数移动平均的更新幅度。越大越「看重最近一次表现」。
 LEARNING_RATE = 0.3
@@ -40,6 +56,13 @@ MASTERED_THRESHOLD = 0.7
 
 # 掌握度低于这个值算「薄弱」，规划路径时会优先安排。
 WEAK_THRESHOLD = 0.4
+
+# 掌握度的半衰期（天）。每过这么多天不打理，掌握度减半。
+#
+# 30 天这个值比情景记忆的 7 天宽容得多，两个理由：
+# 一是知识比事件忘得慢（事件是一次性的，知识是练出来的）；
+# 二是太激进会导致规划器总在复习，永远推不动新内容。
+MASTERY_HALF_LIFE_DAYS = 30.0
 
 # learner_meta 表里存学习目标的固定 key。
 GOAL_KEY = "goal"
@@ -63,7 +86,13 @@ class LearnerProfile:
         print(profile.snapshot())
     """
 
-    def __init__(self, user_id: str, db_path: str | Path | None = None) -> None:
+    def __init__(
+        self,
+        user_id: str,
+        db_path: str | Path | None = None,
+        *,
+        clock: Callable[[], datetime] | None = None,
+    ) -> None:
         """绑定一个用户。
 
         参数
@@ -72,9 +101,14 @@ class LearnerProfile:
             用户 id。画像跟着人走，不跟会话走——换个会话重开，水平还是那个水平。
         db_path:
             数据库路径，不传时用 ``.env`` 里的 ``MEMORY_DB_PATH``。
+        clock:
+            取当前时间的方式。不传就是系统的真实时间。
+            **显式传入是为了让仿真实验能「快进时间」**——不然想验证
+            「一个月不练会掉多少」，得真等一个月。
         """
         self.user_id = user_id
         self._conn: sqlite3.Connection = get_connection(db_path)
+        self._clock: Callable[[], datetime] = clock or datetime.now
 
     # ---------- 掌握度 ----------
 
@@ -97,22 +131,27 @@ class LearnerProfile:
                 mastery     = excluded.mastery,
                 updated_at  = excluded.updated_at
             """,
-            (self.user_id, topic, mastery, now_iso()),
+            (self.user_id, topic, mastery, self._now_iso()),
         )
         self._conn.commit()
         return mastery
 
     def mastery_of(self, topic: str) -> float:
-        """查某个知识点的掌握度。
+        """查某个知识点**现在**的掌握度（已按时间衰减）。
 
         **没记录过的一律算 0.0**（还没学过），而不是报错——
         路径规划要能对着一个全新用户算出「先学什么」，不能因为查不到就崩。
+
+        注意返回的是「现在」的水平，不是「上次练习时」的水平。
+        库里存原始值、读的时候打折，所以反复查询不会让值一路衰减下去。
         """
         row = self._conn.execute(
-            "SELECT mastery FROM learner_mastery WHERE user_id = ? AND topic = ?",
+            "SELECT mastery, updated_at FROM learner_mastery WHERE user_id = ? AND topic = ?",
             (self.user_id, topic),
         ).fetchone()
-        return row["mastery"] if row else 0.0
+        if row is None:
+            return 0.0
+        return _decay(row["mastery"], row["updated_at"], self._clock())
 
     def record_attempt(self, topic: str, correct: bool) -> float:
         """记一次练习结果，返回更新后的掌握度。
@@ -143,23 +182,36 @@ class LearnerProfile:
                 correct     = correct + ?,
                 updated_at  = excluded.updated_at
             """,
-            (self.user_id, topic, new, int(correct), now_iso(), new, int(correct)),
+            (self.user_id, topic, new, int(correct), self._now_iso(), new, int(correct)),
         )
         self._conn.commit()
         return new
 
     def all_topics(self) -> list[dict]:
-        """全部有记录的知识点，按掌握度**从低到高**排（最该补的排前面）。"""
+        """全部有记录的知识点，按**当前**掌握度从低到高排（最该补的排前面）。
+
+        排序放在 Python 里做而不是 SQL 里：掌握度要先按时间衰减才能比大小，
+        而衰减是在读取时算的，SQL 拿到的还是原始值。按原始值排会得出
+        「三个月前练到 0.9 的点排最后」这种结论，但它现在可能只剩 0.3。
+        """
         rows = self._conn.execute(
             """
             SELECT topic, mastery, attempts, correct, updated_at
             FROM learner_mastery
             WHERE user_id = ?
-            ORDER BY mastery ASC, attempts DESC, topic ASC
             """,
             (self.user_id,),
         ).fetchall()
-        return [dict(row) for row in rows]
+
+        now = self._clock()
+        items: list[dict] = []
+        for row in rows:
+            item = dict(row)
+            item["mastery"] = _decay(row["mastery"], row["updated_at"], now)
+            items.append(item)
+
+        items.sort(key=lambda entry: (entry["mastery"], -entry["attempts"], entry["topic"]))
+        return items
 
     def weak_topics(self, limit: int | None = None) -> list[dict]:
         """薄弱的那些（掌握度低于 ``WEAK_THRESHOLD``），最弱的排前面。"""
@@ -307,6 +359,15 @@ class LearnerProfile:
 
     # ---------- 内部 ----------
 
+    def _now_iso(self) -> str:
+        """当前时间的 ISO 文本，时间来源跟着注入的时钟走。
+
+        写入和读取必须用**同一个**时钟：一边用真实时间落库、另一边用模拟
+        时间读取，算出来的间隔会是负数，衰减直接失效。仿真实验就是这么
+        先踩了一脚。
+        """
+        return self._clock().isoformat(timespec="seconds")
+
     def _set_meta(self, key: str, value: str) -> None:
         """写一条用户级设置（有则更新、无则插入）。"""
         self._conn.execute(
@@ -317,7 +378,7 @@ class LearnerProfile:
                 value      = excluded.value,
                 updated_at = excluded.updated_at
             """,
-            (self.user_id, key, value, now_iso()),
+            (self.user_id, key, value, self._now_iso()),
         )
         self._conn.commit()
 
@@ -328,6 +389,30 @@ class LearnerProfile:
             (self.user_id, key),
         ).fetchone()
         return row["value"] if row else None
+
+
+def _decay(mastery: float, updated_at: str, now: datetime) -> float:
+    """把「上次更新时的掌握度」折算成「现在的掌握度」。
+
+    用半衰期描述衰减：每过 ``MASTERY_HALF_LIFE_DAYS`` 天，掌握度减半。
+
+    为什么不直接在库里改这个值：那会变成「每读一次掉一点」，
+    读得越频繁掉得越快。现在是**存原值、读时算**——同一天读一百次，
+    结果完全一样，而且原始数据还在，将来想换衰减曲线也不用跑数据迁移。
+
+    时间戳解析失败、或者时间戳在未来（时钟回拨、手工改过数据）时，
+    原样返回不打折。宁可高估也不能凭一个坏时间戳把用户的掌握度抹掉。
+    """
+    try:
+        updated = datetime.fromisoformat(updated_at)
+    except (TypeError, ValueError):
+        return mastery
+
+    elapsed_days = (now - updated).total_seconds() / 86400
+    if elapsed_days <= 0:
+        return mastery
+
+    return round(mastery * (2 ** (-elapsed_days / MASTERY_HALF_LIFE_DAYS)), 4)
 
 
 def _check_mastery(value: float) -> None:
