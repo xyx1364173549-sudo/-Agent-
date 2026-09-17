@@ -25,15 +25,21 @@ from typing import Any
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from src.api.routers import inspect_router, session_router
 from src.api.schemas import HealthOut
 from src.api.store import SessionStore
+from src.config import PROJECT_ROOT
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-VERSION = "0.5.0"
+VERSION = "0.6.0"
+
+# 前端目录。纯静态页面，不需要构建步骤——双击也能开，
+# 论文答辩时现场演示方便
+WEB_DIR = PROJECT_ROOT / "web"
 
 
 @asynccontextmanager
@@ -107,14 +113,16 @@ def create_app(
             sessions=app.state.sessions.count(),
         )
 
-    @app.get("/", include_in_schema=False)
-    def index() -> dict[str, str]:
-        """根路径给个指引，免得直接访问看到 404 一脸茫然。"""
-        return {
-            "name": "分层记忆驱动的学习路径规划 Agent",
-            "docs": "/docs",
-            "health": "/api/health",
-        }
+    # 前端页面挂到根路径，**必须在所有 API 路由之后**——
+    # mount("/") 是个通配匹配，先挂它会把 /api/... 也一并吞掉。
+    #
+    # 前后端同源的好处：不用处理跨域，前端里直接写 fetch('/api/...') 就行，
+    # 演示时也只需要起一个服务。
+    if WEB_DIR.exists():
+        app.mount("/", StaticFiles(directory=str(WEB_DIR), html=True), name="web")
+        logger.info("前端已挂载 | %s", WEB_DIR)
+    else:
+        logger.warning("没找到前端目录 %s，只有接口可用", WEB_DIR)
 
     logger.info("应用已组装 | 版本 %s | 接口文档 /docs", VERSION)
     return app

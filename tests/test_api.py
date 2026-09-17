@@ -15,6 +15,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -108,10 +109,65 @@ def test_health(client: TestClient) -> None:
     assert body["sessions"] == 0
 
 
-def test_index_points_to_docs(client: TestClient) -> None:
-    """根路径给指引，免得直接访问看到 404 一脸茫然。"""
-    body = client.get("/").json()
-    assert body["docs"] == "/docs"
+def test_frontend_page_is_served(client: TestClient) -> None:
+    """根路径返回前端页面，前后端同源。
+
+    同源的好处很实际：不用处理跨域，前端里直接写 ``fetch('/api/...')``，
+    演示时也只需要起一个服务。
+    """
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert "text/html" in response.headers["content-type"]
+    assert "学习路径规划" in response.text
+
+
+@pytest.mark.parametrize("asset", ["/style.css", "/app.js"])
+def test_frontend_assets_available(client: TestClient, asset: str) -> None:
+    """样式和脚本要能取到，否则页面打开是一片白。"""
+    assert client.get(asset).status_code == 200
+
+
+def test_frontend_has_three_column_skeleton(client: TestClient) -> None:
+    """三栏骨架的元素要在，别被误删。
+
+    前端没有单元测试框架，这类「结构性断言」就是最低成本的保护：
+    哪次重构不小心删掉了记忆面板的容器，这里会立刻红。
+    """
+    html = client.get("/").text
+
+    for element_id in ("chat", "path", "profile", "events", "facts", "answer-input", "start-btn"):
+        assert f'id="{element_id}"' in html, f"页面里少了 id={element_id} 的元素"
+
+
+def test_frontend_dom_references_are_consistent(project_root: Path) -> None:
+    """app.js 里引用的 DOM id，必须都在 index.html 里存在。
+
+    拼错一个 id，运行时只会拿到 ``null``，真正的报错要等到用户点下去才出现，
+    而且错误位置离原因很远。放在这里拦下，代价几乎为零。
+    """
+    html = (project_root / "web" / "index.html").read_text(encoding="utf-8")
+    script = (project_root / "web" / "app.js").read_text(encoding="utf-8")
+
+    html_ids = set(re.findall(r'id="([^"]+)"', html))
+    used_ids = set(re.findall(r"getElementById\('([^']+)'\)", script))
+
+    assert used_ids, "没解析到任何 DOM 引用，检查脚本写法是否变了"
+    missing = used_ids - html_ids
+    assert not missing, f"app.js 引用了页面上不存在的 id：{sorted(missing)}"
+
+
+def test_api_still_wins_over_static_mount(client: TestClient) -> None:
+    """静态目录挂在根路径上，但不能把 /api 的接口吞掉。
+
+    这条盯的是注册顺序：``mount("/")`` 是个通配匹配，先挂它的话
+    所有接口都会 404。
+    """
+    assert client.get("/api/health").status_code == 200
+
+    missing = client.get("/api/sessions/nope")
+    assert missing.status_code == 404
+    assert "没有找到会话" in missing.json()["detail"]
 
 
 def test_openapi_schema_is_available(client: TestClient) -> None:

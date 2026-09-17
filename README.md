@@ -2,6 +2,13 @@
 
 本科毕业论文项目。构建一个具备**分层记忆**与**动态任务规划**能力的个性化学习伴侣 Agent 系统。
 
+## 界面
+
+![开课中](docs/screenshots/01-开课中.png)
+
+左栏是对话区（导师讲解逐字流式输出、出题、批改），中栏是学习路径（每步带掌握度与依赖关系），
+右栏是记忆面板（学习者画像、情景事件、沉淀事实）。三个栏位的数据全部来自同一套分层记忆。
+
 ## 核心研究点
 
 | 章节 | 内容 | 关键技术 |
@@ -13,11 +20,12 @@
 ## 技术栈
 
 - **语言**：Python
-- **Agent 框架**：LangChain（`init_chat_model` / PromptTemplate / @tool）、LangGraph
+- **Agent 框架**：LangGraph（状态图 + 条件路由 + 循环 + checkpointer）、LangChain
 - **RAG**：文本切分 → 向量化 → Chroma 检索 → 重排
 - **后端**：FastAPI + SSE 流式输出
-- **持久化**：SQLite（分层记忆）、JSON（早期原型）
-- **模型接入**：DeepSeek API（OpenAI 兼容协议）
+- **前端**：原生 HTML / CSS / JS（无构建步骤，直接由后端托管）
+- **持久化**：SQLite（分层记忆与学习者画像）
+- **模型接入**：DeepSeek API
 - **工程化**：Docker 容器化、MCP 协议
 
 ## 目录规划
@@ -25,14 +33,16 @@
 ```
 .
 ├── src/              # 核心源码
-│   ├── memory/       # 分层记忆三件套
-│   ├── agents/       # 多 Agent 实现
-│   ├── planning/     # 动态任务规划
-│   ├── rag/          # 检索增强生成
-│   └── api/          # FastAPI 服务层
+│   ├── memory/       # 分层记忆三件套 + 遗忘策略 + 上下文组装
+│   ├── planning/     # 学习者画像、目标拆解、路径规划、LangGraph 编排
+│   ├── agents/       # 导师 / 出题 / 评估三类功能 Agent
+│   ├── rag/          # 检索增强生成（加载 / 切分 / 向量库 / 检索）
+│   └── api/          # FastAPI 服务层（应用工厂 + 路由 + 会话缓存 + SSE）
+├── web/              # 前端页面（静态资源，由后端托管）
 ├── tests/            # 单元测试与边界测试
-├── examples/         # 可运行示例（demo_memory.py：分层记忆效果演示）
-├── docs/             # 设计文档、实验记录
+├── examples/         # 可运行示例
+├── scripts/          # 知识库构建、进度看板、一键校验
+├── docs/             # 设计文档、实验记录、界面截图
 ├── data/             # 数据文件（不入库）
 ├── .env.example      # 环境变量模板
 └── README.md
@@ -48,14 +58,21 @@ python -m venv .venv
 # 2. 安装依赖
 pip install -r requirements.txt
 
-# 3. 配置密钥
-copy .env.example .env        # 然后填入自己的 API Key
+# 3. 配置密钥（注意：要填在 .env 里，不是 .env.example）
+copy .env.example .env
 
-# 4. 跑分层记忆 demo，直接看效果
-python examples/demo_memory.py
+# 4a. 只想看效果：跑学习闭环 demo（命令行）
+python examples/demo_learning.py
+
+# 4b. 想用界面：起服务，然后打开 http://127.0.0.1:8000
+python -m uvicorn src.api.app:app --reload
 ```
 
+打开 http://127.0.0.1:8000/docs 可以看到自动生成的接口文档，
+每个字段的含义都在上面。
+
 ## 环境变量
+
 
 | 变量名 | 说明 |
 | --- | --- |

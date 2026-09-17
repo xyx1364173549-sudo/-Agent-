@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>分层记忆驱动的学习路径规划 Agent</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<!-- 顶栏：目标输入与整体状态 -->
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">分层记忆</span>
+    <span class="brand-sub">学习路径规划 Agent</span>
+  </div>
+
+  <form class="goal-form" id="goal-form">
+    <input
+      id="goal-input"
+      type="text"
+      placeholder="想学什么？例如：掌握递归"
+      value="掌握递归"
+      maxlength="200"
+      autocomplete="off"
+    >
+    <input id="user-input" type="text" class="user-input" value="demo-user" maxlength="64" title="用户 id">
+    <button id="start-btn" type="submit">开始学习</button>
+  </form>
+
+  <div class="status-chip" id="status-chip" hidden>
+    <span class="spinner" id="spinner" hidden></span>
+    <span id="status-text">就绪</span>
+  </div>
+</header>
+
+<!-- 错误提示条：默认隐藏，出错时滑下来 -->
+<div class="alert" id="alert" hidden>
+  <span id="alert-text"></span>
+  <button type="button" id="alert-close" aria-label="关闭">×</button>
+</div>
+
+<main class="layout">
+
+  <!-- 左栏：对话区 -->
+  <section class="panel chat-panel">
+    <h2 class="panel-title">对话区<span class="panel-hint">导师讲解 · 练习 · 批改</span></h2>
+    <div class="chat-scroll" id="chat"></div>
+
+    <form class="answer-form" id="answer-form">
+      <textarea
+        id="answer-input"
+        rows="2"
+        placeholder="先点「开始学习」"
+        disabled
+      ></textarea>
+      <button id="answer-btn" type="submit" disabled>提交作答</button>
+    </form>
+    <p class="hint-line" id="question-hint"></p>
+  </section>
+
+  <!-- 中栏：学习路径 -->
+  <section class="panel path-panel">
+    <h2 class="panel-title">学习路径<span class="panel-hint" id="path-progress">未开始</span></h2>
+    <div class="path-scroll" id="path"></div>
+  </section>
+
+  <!-- 右栏：记忆面板 -->
+  <section class="panel memory-panel">
+    <h2 class="panel-title">记忆面板<span class="panel-hint" id="memory-stats">—</span></h2>
+    <div class="memory-scroll">
+      <h3 class="block-title">学习者画像</h3>
+      <pre class="snapshot" id="profile">尚未建立</pre>
+
+      <h3 class="block-title">最近发生的事<span class="count" id="event-count"></span></h3>
+      <ul class="event-list" id="events"></ul>
+
+      <h3 class="block-title">沉淀的事实<span class="count" id="fact-count"></span></h3>
+      <ul class="event-list" id="facts"></ul>
+    </div>
+  </section>
+
+</main>
+
+<script src="/app.js"></script>
+</body>
+</html>
