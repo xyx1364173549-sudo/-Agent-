@@ -9,14 +9,17 @@
 """
 
 from src.memory.episodic import EpisodicMemory
+from src.memory.semantic import SemanticMemory, extract_facts
 from src.memory.store import SCHEMA_VERSION, get_connection, init_db, now_iso
 from src.memory.working import WorkingMemory, count_tokens
 
 __all__ = [
     "SCHEMA_VERSION",
     "EpisodicMemory",
+    "SemanticMemory",
     "WorkingMemory",
     "count_tokens",
+    "extract_facts",
     "get_connection",
     "init_db",
     "now_iso",
