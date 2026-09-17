@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-from datetime import datetime
 from pathlib import Path
 
 import pytest
@@ -187,11 +186,26 @@ def test_task_status_label_and_icon() -> None:
 
 def test_render_html_contains_key_sections(sample_plan: Path) -> None:
     plan = parse_plan(sample_plan)
-    html = render_html(plan, generated_at=datetime(2026, 9, 16, 12, 0))
+    html = render_html(plan)
     assert "<!DOCTYPE html>" in html
     assert "M0" in html and "模块零" in html
     assert "50.0" in html
-    assert "2026-09-16 12:00" in html
+
+
+def test_render_html_is_deterministic(sample_plan: Path) -> None:
+    """同一个 PLAN.md 渲染两次，结果必须逐字节相同。
+
+    看板页脚曾经写着「生成时间」，于是每次重新生成都有 diff，
+    `check.py` 一跑就多出一堆只改时间戳的提交。这里守住幂等性。
+    """
+    plan = parse_plan(sample_plan)
+    assert render_html(plan) == render_html(plan)
+
+
+def test_render_html_has_no_timestamp(sample_plan: Path) -> None:
+    """页脚不该出现「生成时间」——它是渲染不幂等的唯一来源。"""
+    html = render_html(parse_plan(sample_plan))
+    assert "生成时间" not in html
 
 
 def test_render_html_escapes_untrusted_text(tmp_path: Path) -> None:

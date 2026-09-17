@@ -25,7 +25,6 @@ import argparse
 import html
 import re
 from dataclasses import dataclass, field
-from datetime import datetime
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -303,9 +302,13 @@ def _render_module(module: Module, active_code: str | None) -> str:
     )
 
 
-def render_html(plan: Plan, *, generated_at: datetime | None = None) -> str:
-    """渲染自包含的深色主题看板（无外部资源依赖，双击即可打开）。"""
-    stamp = (generated_at or datetime.now()).strftime("%Y-%m-%d %H:%M")
+def render_html(plan: Plan) -> str:
+    """渲染自包含的深色主题看板（无外部资源依赖，双击即可打开）。
+
+    刻意**不写入生成时间**。原因是：只要页脚带了时间戳，每次重新生成看板
+    都会产生 diff，于是 `check.py` 一跑就冒出一堆「只改时间戳」的提交，
+    把提交历史搞得又长又没信息量。渲染保持幂等，历史才干净。
+    """
     active = plan.current_module
     active_note = f"当前进行：{active.code} {active.name}" if active else "全部模块已完成"
 
@@ -351,7 +354,7 @@ def render_html(plan: Plan, *, generated_at: datetime | None = None) -> str:
   <div class="grid">{cards}</div>
 
   <footer>
-    生成时间：{stamp}　·　更新进度请编辑 <code>PLAN.md</code> 的复选框，然后运行
+    更新进度请编辑 <code>PLAN.md</code> 的复选框，然后运行
     <code>python scripts/gen_progress.py</code>
   </footer>
 </div>
