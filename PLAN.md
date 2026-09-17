@@ -55,7 +55,7 @@
 - [x] M2.2 工作记忆 WorkingMemory — 交付：`src/memory/working.py`，滑动窗口 + token 预算裁剪
 - [x] M2.3 情景记忆 EpisodicMemory — 交付：`src/memory/episodic.py`，事件流写入 + 时间线/关键词检索
 - [x] M2.4 语义记忆 SemanticMemory — 交付：`src/memory/semantic.py`，规则抽取 + 去重合并 + 冲突更新
-- [ ] M2.5 记忆管理器 MemoryManager — 交付：三件套统一门面与路由
+- [x] M2.5 记忆管理器 MemoryManager — 交付：`src/memory/manager.py`，三件套统一门面与路由
 - [ ] M2.6 记忆上下文组装 — 交付：分层检索 + 按预算压缩 + 优先级排序
 - [ ] M2.7 遗忘与巩固策略 — 交付：时间衰减 + 重要性打分 + 归档
 - [ ] M2.8 记忆模块测试与演示 — 交付：测试全绿 + 可运行 demo 脚本

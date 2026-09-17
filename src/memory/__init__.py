@@ -3,12 +3,17 @@
 - 工作记忆 WorkingMemory：当前会话的短期上下文
 - 情景记忆 EpisodicMemory：发生过的事件与交互轨迹
 - 语义记忆 SemanticMemory：沉淀下来的稳定事实与结论
+- 记忆管理器 MemoryManager：把上面三种收拢成一个入口
 
 三种记忆统一存在**同一个 SQLite 文件**里，各占一张表，底层连接与建表
 由 ``store.py`` 负责。
+
+日常使用推荐直接从 ``MemoryManager`` 入手；需要细粒度操作时，
+再到它下面三个属性上去取。
 """
 
 from src.memory.episodic import EpisodicMemory
+from src.memory.manager import MemoryManager
 from src.memory.semantic import SemanticMemory, extract_facts
 from src.memory.store import SCHEMA_VERSION, get_connection, init_db, now_iso
 from src.memory.working import WorkingMemory, count_tokens
@@ -16,6 +21,7 @@ from src.memory.working import WorkingMemory, count_tokens
 __all__ = [
     "SCHEMA_VERSION",
     "EpisodicMemory",
+    "MemoryManager",
     "SemanticMemory",
     "WorkingMemory",
     "count_tokens",
