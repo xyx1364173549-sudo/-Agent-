@@ -9,5 +9,13 @@
 """
 
 from src.memory.store import SCHEMA_VERSION, get_connection, init_db, now_iso
+from src.memory.working import WorkingMemory, count_tokens
 
-__all__ = ["SCHEMA_VERSION", "get_connection", "init_db", "now_iso"]
+__all__ = [
+    "SCHEMA_VERSION",
+    "WorkingMemory",
+    "count_tokens",
+    "get_connection",
+    "init_db",
+    "now_iso",
+]

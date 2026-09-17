@@ -52,7 +52,7 @@
 <!-- section: 第 4 章（创新点 1） -->
 
 - [x] M2.1 SQLite 存储层与建表迁移 — 交付：`src/memory/store.py`，连接管理 + 三表 schema 初始化
-- [ ] M2.2 工作记忆 WorkingMemory — 交付：滑动窗口 + token 预算裁剪
+- [x] M2.2 工作记忆 WorkingMemory — 交付：`src/memory/working.py`，滑动窗口 + token 预算裁剪
 - [ ] M2.3 情景记忆 EpisodicMemory — 交付：事件流写入 + 时间线/相关性检索
 - [ ] M2.4 语义记忆 SemanticMemory — 交付：事实抽取 + 去重合并 + 冲突更新
 - [ ] M2.5 记忆管理器 MemoryManager — 交付：三件套统一门面与路由
@@ -124,3 +124,4 @@
 | 2026-09-16 | **简化重构**：移除小米 MiMo 支持与「多提供方」抽象，收敛为 DeepSeek 单提供方；同步清理 config、.env.example、README、src/__init__ 与测试 |
 | 2026-09-16 | **M1.1 二次简化**：改用 `langchain-deepseek` 的 `ChatDeepSeek`，代码为「load_dotenv → os.getenv → ChatDeepSeek」三步直写；默认模型 `deepseek-v4-flash`；`config.py` 职责收窄为「路径与端口」 |
 | 2026-09-17 | M2.1 完成：`src/memory/store.py` 建起 working / episodic / semantic 三张表，含连接管理、索引、UNIQUE 约束与 `PRAGMA user_version` 版本号，14 条测试全绿 |
+| 2026-09-17 | M2.2 完成：`src/memory/working.py` 工作记忆，滑动窗口（条数上限）+ token 预算裁剪（超限丢最老的），17 条测试全绿 |
