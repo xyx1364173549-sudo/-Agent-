@@ -17,6 +17,8 @@ SQLite 里、分三层、怎么检索。它只管拿着上下文讲课。查记�
 职责分开，两边都能单独测试。
 """
 
+from collections.abc import Callable
+
 from src.agents.base import Agent
 
 PROMPT_TEMPLATE = """你是一位耐心的一对一编程导师，正在给一位大学生讲知识点。
@@ -45,7 +47,13 @@ class TutorAgent(Agent):
 
     name = "tutor"
 
-    def explain(self, topic: str, *, context: str = "") -> str:
+    def explain(
+        self,
+        topic: str,
+        *,
+        context: str = "",
+        on_token: Callable[[str], None] | None = None,
+    ) -> str:
         """讲解一个知识点。
 
         参数
@@ -55,14 +63,21 @@ class TutorAgent(Agent):
         context:
             学生情况简报。通常传 ``MemoryManager.context()`` 与
             ``LearnerProfile.snapshot()`` 拼起来的文字；不传就按零基础讲。
+        on_token:
+            传了就改成**流式**生成：每产出一小段文字就回调一次。
+            Web 层用它把内容一个字一个字推给浏览器。不传则老老实实等全文。
 
         返回
         ----
-        讲解正文（纯文本）。
+        讲解正文（纯文本）。注意流式模式下返回的仍是**完整全文**——
+        前端要的是过程，记忆和状态要的是结果，两边都不能少。
         """
         topic = topic.strip()
         if not topic:
             raise ValueError("知识点不能为空")
 
         prompt = PROMPT_TEMPLATE.format(topic=topic, context=context.strip() or NO_CONTEXT)
-        return self._ask(prompt)
+
+        if on_token is None:
+            return self._ask(prompt)
+        return self._ask_stream(prompt, on_token)

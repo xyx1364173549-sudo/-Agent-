@@ -18,7 +18,7 @@ import json
 
 import pytest
 
-from src.agents import GraderAgent, QuizAgent, TutorAgent
+from src.agents import GraderAgent, QuizAgent, TokenStream, TutorAgent
 
 
 class FakeReply:
@@ -94,6 +94,83 @@ def test_tutor_strips_whitespace_from_reply() -> None:
     tutor = TutorAgent(FakeModel("\n\n  讲解正文  \n\n"))
 
     assert tutor.explain("递归") == "讲解正文"
+
+
+# --------------------------------------------------------------------------
+# 讲解片段的出口（流式）
+# --------------------------------------------------------------------------
+
+
+class StreamingModel:
+    """带流式输出的假模型：按字往外吐。"""
+
+    def __init__(self, content: str) -> None:
+        self.content = content
+
+    def invoke(self, prompt: str) -> FakeReply:
+        return FakeReply(self.content)
+
+    def stream(self, prompt: str):
+        for char in self.content:
+            yield FakeReply(char)
+
+
+def test_token_stream_inactive_by_default() -> None:
+    stream = TokenStream()
+
+    assert stream.active is False
+    assert stream.as_agent_arg() is None, "没人在听时应当明确告诉 Agent「不用流式」"
+
+
+def test_token_stream_delivers_to_callback() -> None:
+    received: list[str] = []
+    stream = TokenStream(received.append)
+
+    stream("你好")
+
+    assert stream.active is True
+    assert received == ["你好"]
+
+
+def test_token_stream_callback_can_be_swapped() -> None:
+    """回调可以后挂——Web 层先建会话、等 SSE 就绪了再挂上。"""
+    stream = TokenStream()
+    received: list[str] = []
+    stream.callback = received.append
+
+    stream("abc")
+
+    assert received == ["abc"]
+
+
+def test_tutor_streams_when_callback_given() -> None:
+    """有人听的时候逐字推，但返回的仍是完整全文。
+
+    两边都要：前端要过程，记忆和状态要结果。
+    """
+    received: list[str] = []
+    text = TutorAgent(StreamingModel("递归就是自己调用自己")).explain("递归", on_token=received.append)
+
+    assert text == "递归就是自己调用自己"
+    assert "".join(received) == text
+
+
+def test_tutor_does_not_stream_without_callback() -> None:
+    """没人听的时候不该走流式路径。
+
+    这条守着一个踩过的坑：曾经把回调外面包了一层包装函数再传下来，结果
+    「没人在听」也被判成有人听，脚本和单元测试全被拖进流式路径，
+    最后报一句「模型没有 stream 方法」，排查半天才发现是判断条件写错了。
+    """
+
+    class InvokeOnly:
+        def invoke(self, prompt: str) -> FakeReply:
+            return FakeReply("讲解正文")
+
+        def stream(self, prompt: str):
+            raise AssertionError("没人听的时候不该调用 stream")
+
+    assert TutorAgent(InvokeOnly()).explain("递归") == "讲解正文"
 
 
 # --------------------------------------------------------------------------

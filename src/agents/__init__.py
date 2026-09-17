@@ -8,9 +8,9 @@
 不在这一层，交给编排层。
 """
 
-from src.agents.base import Agent
+from src.agents.base import Agent, TokenStream
 from src.agents.grader import GraderAgent
 from src.agents.quiz import QuizAgent
 from src.agents.tutor import TutorAgent
 
-__all__ = ["Agent", "GraderAgent", "QuizAgent", "TutorAgent"]
+__all__ = ["Agent", "GraderAgent", "QuizAgent", "TokenStream", "TutorAgent"]

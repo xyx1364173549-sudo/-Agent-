@@ -26,6 +26,7 @@ import operator
 from typing import Annotated, TypedDict
 
 from src.agents import GraderAgent, QuizAgent, TutorAgent
+from src.agents.base import TokenStream
 from src.memory.manager import MemoryManager
 from src.planning.planner import STATUS_REVIEW, plan
 from src.planning.profile import LearnerProfile, WEAK_THRESHOLD
@@ -192,6 +193,7 @@ def teach_node(
     tutor: TutorAgent,
     memory: MemoryManager,
     profile: LearnerProfile,
+    token_stream: TokenStream | None = None,
 ) -> dict:
     """讲解当前知识点。
 
@@ -200,6 +202,9 @@ def teach_node(
 
     这就是「分层记忆驱动的个性化教学」在代码里的样子——
     同一个知识点，不同的人拿到不同的讲解。
+
+    ``token_stream`` 是给 Web 层留的出口：有人听就让讲解逐字冒出来，
+    没人听（脚本、测试）就一次性生成完。
     """
     topic = state["topic"]
     parts: list[str] = []
@@ -220,7 +225,9 @@ def teach_node(
             "请换一种讲法或换个类比，不要重复上次的说法。"
         )
 
-    explanation = tutor.explain(topic, context="\n\n".join(parts))
+    # 有没有人在听决定走哪条路：没人听就传 None，让 Agent 一次性生成
+    on_token = token_stream.as_agent_arg() if token_stream is not None else None
+    explanation = tutor.explain(topic, context="\n\n".join(parts), on_token=on_token)
     memory.record_event("taught", f"讲解了《{topic}》", importance=0.4)
     # 讲解也进工作记忆：下一轮讲解时 memory.context() 会带上「刚才讲了什么」，
     # 学生说「还是没懂」时导师才知道该在哪个说法上再展开

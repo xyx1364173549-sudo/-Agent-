@@ -157,6 +157,8 @@ def get_connection(db_path: str | Path | None = None) -> sqlite3.Connection:
     ----
     ``sqlite3.Connection``。注意设了 ``row_factory``，所以查询结果可以
     按列名取值：``row["content"]``，比 ``row[2]`` 好读得多。
+
+    另外还关掉了 ``check_same_thread`` 检查，原因见下。
     """
     path = Path(db_path) if db_path else get_settings().memory_db_path
 
@@ -164,7 +166,16 @@ def get_connection(db_path: str | Path | None = None) -> sqlite3.Connection:
     # 少了这一步在全新环境下会直接报 "unable to open database file"。
     path.parent.mkdir(parents=True, exist_ok=True)
 
-    conn = sqlite3.connect(path)
+    # check_same_thread=False：SQLite 默认禁止连接跨线程使用，而 Web 服务里
+    # 一个会话的连接会在多个请求之间复用，FastAPI 的同步端点又跑在线程池上——
+    # 不同请求落到不同线程是常态，照默认设置会直接报
+    # "SQLite objects created in a thread can only be used in that same thread"。
+    #
+    # 关掉这个检查安全吗？安全。Python 3.11 起 sqlite3 模块编译为 serialized
+    # 模式（sqlite3.threadsafety == 3），底层自带互斥锁，多线程共享同一个连接
+    # 有 SQLite 自己兜着。这也意味着并发写会串行执行——对单机应用完全够用，
+    # 真上高并发该换 PostgreSQL，而不是在这里硬撑。
+    conn = sqlite3.connect(path, check_same_thread=False)
     conn.row_factory = sqlite3.Row
     init_db(conn)
     return conn

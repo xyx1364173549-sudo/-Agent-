@@ -25,3 +25,10 @@ langgraph>=1.2.11
 # LangGraph 的节点里要写类型化的状态（TypedDict + Annotated），这由 langchain-core 提供。
 # 它本来是 langchain-deepseek 的传递依赖，这里显式声明，避免上游改依赖时静默消失
 langchain-core>=1.6.3
+
+# ---------- M5 服务层 ----------
+# Web 框架。它的接口文档是白送的（打开 /docs 就能看），
+# 而那正是 Pydantic 出参模型换来的
+fastapi>=0.141.1
+# ASGI 服务器，跑 FastAPI 用。[standard] 带上 websockets 等常用件
+uvicorn[standard]>=0.30.0

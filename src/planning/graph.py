@@ -47,6 +47,7 @@
 ``build_graph()`` 的 ``checkpointer`` 参数就是为这个留的口子。
 """
 
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
@@ -54,6 +55,7 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, StateGraph
 
 from src.agents import GraderAgent, QuizAgent, TutorAgent
+from src.agents.base import TokenStream
 from src.memory.manager import MemoryManager
 from src.planning.decomposer import decompose
 from src.planning.profile import LearnerProfile
@@ -83,6 +85,7 @@ def build_graph(
     profile: LearnerProfile,
     memory: MemoryManager,
     checkpointer: Any | None = None,
+    token_stream: TokenStream | None = None,
 ) -> Any:
     """把节点组装成可执行的图。
 
@@ -96,6 +99,9 @@ def build_graph(
         分层记忆——讲解时提供上下文，过程里记事件。
     checkpointer:
         状态存档方式。不传就用内存版。
+    token_stream:
+        讲解片段的出口，给 Web 层的 SSE 用。没人往里挂回调时
+        ``TokenStream.active`` 为假，讲解就一次性生成，不走流式。
 
     返回
     ----
@@ -106,10 +112,20 @@ def build_graph(
 
     # 节点函数本身是 ``(state) -> dict`` 的形式（见 session.py），
     # 依赖靠这里绑进去。这样 session.py 不必知道图的存在，能单独测试。
+    #
+    # token_stream 传的是**对象**而不是函数：回调挂在对象上、随时可换，
+    # 而节点每次执行都去问它「现在有没有人在听」。这样 Web 层可以先建会话、
+    # 等 SSE 就绪了再挂回调，不必重建整张图。
     graph.add_node("choose", lambda state: choose_topic_node(state, profile=profile))
     graph.add_node(
         "teach",
-        lambda state: teach_node(state, tutor=tutor, memory=memory, profile=profile),
+        lambda state: teach_node(
+            state,
+            tutor=tutor,
+            memory=memory,
+            profile=profile,
+            token_stream=token_stream,
+        ),
     )
     graph.add_node(
         "quiz",
@@ -174,6 +190,7 @@ class LearningSession:
         db_path: str | Path | None = None,
         max_topics: int = 8,
         checkpointer: Any | None = None,
+        on_token: Callable[[str], None] | None = None,
     ) -> None:
         """开一场会话。
 
@@ -191,10 +208,17 @@ class LearningSession:
             数据库路径，不传用 ``.env`` 里的配置。
         max_topics:
             最多拆出几个知识点。
+        on_token:
+            讲解时的逐字回调，供 Web 层做流式输出。开课前随时改
+            ``self.tokens.callback`` 就能换掉它。
         """
         self.goal = goal
         self.user_id = user_id
         self.session_id = session_id
+
+        # 讲解片段的出口。传对象而不是函数，是为了让节点能分辨
+        # 「有人在听」和「没人听」——见 TokenStream 的说明
+        self.tokens = TokenStream(on_token)
 
         self.profile = LearnerProfile(user_id, db_path=db_path)
         self.memory = MemoryManager(session_id, user_id=user_id, db_path=db_path)
@@ -211,6 +235,7 @@ class LearningSession:
             profile=self.profile,
             memory=self.memory,
             checkpointer=checkpointer,
+            token_stream=self.tokens,
         )
         self._config = {"configurable": {"thread_id": session_id}}
         self.state: LearningState = {}
