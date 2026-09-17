@@ -17,8 +17,10 @@
 """
 
 import sqlite3
+from datetime import datetime
 from pathlib import Path
 
+from src.memory.forgetting import DEFAULT_FORGET_THRESHOLD, DEFAULT_HALF_LIFE_DAYS, strength
 from src.memory.store import get_connection, now_iso
 
 
@@ -83,7 +85,7 @@ class EpisodicMemory:
             """
             SELECT id, event_type, content, importance, created_at
             FROM episodic_memory
-            WHERE session_id = ?
+            WHERE session_id = ? AND archived = 0
             ORDER BY created_at DESC, id DESC
             LIMIT ?
             """,
@@ -106,7 +108,7 @@ class EpisodicMemory:
             """
             SELECT id, event_type, content, importance, created_at
             FROM episodic_memory
-            WHERE session_id = ? AND content LIKE ?
+            WHERE session_id = ? AND archived = 0 AND content LIKE ?
             ORDER BY created_at DESC, id DESC
             LIMIT ?
             """,
@@ -120,7 +122,7 @@ class EpisodicMemory:
             """
             SELECT id, event_type, content, importance, created_at
             FROM episodic_memory
-            WHERE session_id = ? AND event_type = ?
+            WHERE session_id = ? AND archived = 0 AND event_type = ?
             ORDER BY created_at DESC, id DESC
             LIMIT ?
             """,
@@ -129,9 +131,103 @@ class EpisodicMemory:
         return [dict(row) for row in rows]
 
     def count(self) -> int:
-        """当前记了多少条事件。"""
+        """当前**有效**的事件条数（不含已被遗忘归档的）。"""
         row = self._conn.execute(
-            "SELECT COUNT(*) AS c FROM episodic_memory WHERE session_id = ?",
+            "SELECT COUNT(*) AS c FROM episodic_memory WHERE session_id = ? AND archived = 0",
+            (self.session_id,),
+        ).fetchone()
+        return row["c"]
+
+    # ---------- 遗忘与巩固 ----------
+
+    def decay_report(
+        self,
+        *,
+        half_life_days: float = DEFAULT_HALF_LIFE_DAYS,
+        now: datetime | None = None,
+    ) -> list[dict]:
+        """列出每条事件的当前强度，**最该忘的排最前面**。
+
+        用来调试，也用来给论文画遗忘曲线。``now`` 可以显式指定——
+        这样不用真等一周，就能验证「一周后强度减半」。
+        """
+        rows = self._conn.execute(
+            """
+            SELECT id, event_type, content, importance, created_at
+            FROM episodic_memory
+            WHERE session_id = ? AND archived = 0
+            """,
+            (self.session_id,),
+        ).fetchall()
+
+        report = [
+            {
+                **dict(row),
+                "strength": strength(
+                    row["importance"],
+                    row["created_at"],
+                    now=now,
+                    half_life_days=half_life_days,
+                ),
+            }
+            for row in rows
+        ]
+        report.sort(key=lambda item: item["strength"])
+        return report
+
+    def forget_weak(
+        self,
+        threshold: float = DEFAULT_FORGET_THRESHOLD,
+        *,
+        half_life_days: float = DEFAULT_HALF_LIFE_DAYS,
+        now: datetime | None = None,
+    ) -> int:
+        """把强度低于阈值的事件**归档**，返回归档了几条。
+
+        为什么归档而不是删除？因为删了就真的没了。归档之后默认查询看不到它，
+        但数据还在库里——万一以后要回溯（比如论文里统计「遗忘曲线长什么样」），
+        原始记录不会丢。
+        """
+        weak_ids = [
+            item["id"]
+            for item in self.decay_report(half_life_days=half_life_days, now=now)
+            if item["strength"] < threshold
+        ]
+        if not weak_ids:
+            return 0
+
+        self._conn.executemany(
+            "UPDATE episodic_memory SET archived = 1 WHERE id = ?",
+            [(event_id,) for event_id in weak_ids],
+        )
+        self._conn.commit()
+        return len(weak_ids)
+
+    def reinforce(self, event_id: int, boost: float = 0.1) -> float:
+        """给某条事件「加深印象」，返回提升后的 importance。
+
+        什么时候用？同类的事又发生了一次，说明这不是偶然——把重要性提上去，
+        它在遗忘曲线上就能撑得更久。这就是「巩固」：**重复出现延缓遗忘**。
+        """
+        row = self._conn.execute(
+            "SELECT importance FROM episodic_memory WHERE id = ?",
+            (event_id,),
+        ).fetchone()
+        if row is None:
+            raise ValueError(f"没有 id 为 {event_id} 的事件")
+
+        new_importance = min(1.0, row["importance"] + boost)
+        self._conn.execute(
+            "UPDATE episodic_memory SET importance = ? WHERE id = ?",
+            (new_importance, event_id),
+        )
+        self._conn.commit()
+        return new_importance
+
+    def archived_count(self) -> int:
+        """已经被遗忘（归档）的事件条数。"""
+        row = self._conn.execute(
+            "SELECT COUNT(*) AS c FROM episodic_memory WHERE session_id = ? AND archived = 1",
             (self.session_id,),
         ).fetchone()
         return row["c"]
