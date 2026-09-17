@@ -17,3 +17,11 @@ langchain-deepseek>=1.1.0
 chromadb>=1.5.9
 # 读 PDF 资料用。不装也能跑，只是 .pdf 会提示怎么装，md/txt 不受影响
 pypdf>=5.0.0
+
+# ---------- M4 学习者画像 · 动态规划 · 多 Agent ----------
+# 把「学 → 练 → 评 → 调」的闭环连成状态图：条件路由、循环、状态存档都用它。
+# 论文第 5 章「动态任务规划」的实现载体
+langgraph>=1.2.11
+# LangGraph 的节点里要写类型化的状态（TypedDict + Annotated），这由 langchain-core 提供。
+# 它本来是 langchain-deepseek 的传递依赖，这里显式声明，避免上游改依赖时静默消失
+langchain-core>=1.6.3
