@@ -53,7 +53,7 @@
 
 - [x] M2.1 SQLite 存储层与建表迁移 — 交付：`src/memory/store.py`，连接管理 + 三表 schema 初始化
 - [x] M2.2 工作记忆 WorkingMemory — 交付：`src/memory/working.py`，滑动窗口 + token 预算裁剪
-- [ ] M2.3 情景记忆 EpisodicMemory — 交付：事件流写入 + 时间线/相关性检索
+- [x] M2.3 情景记忆 EpisodicMemory — 交付：`src/memory/episodic.py`，事件流写入 + 时间线/关键词检索
 - [ ] M2.4 语义记忆 SemanticMemory — 交付：事实抽取 + 去重合并 + 冲突更新
 - [ ] M2.5 记忆管理器 MemoryManager — 交付：三件套统一门面与路由
 - [ ] M2.6 记忆上下文组装 — 交付：分层检索 + 按预算压缩 + 优先级排序
@@ -125,3 +125,4 @@
 | 2026-09-16 | **M1.1 二次简化**：改用 `langchain-deepseek` 的 `ChatDeepSeek`，代码为「load_dotenv → os.getenv → ChatDeepSeek」三步直写；默认模型 `deepseek-v4-flash`；`config.py` 职责收窄为「路径与端口」 |
 | 2026-09-17 | M2.1 完成：`src/memory/store.py` 建起 working / episodic / semantic 三张表，含连接管理、索引、UNIQUE 约束与 `PRAGMA user_version` 版本号，14 条测试全绿 |
 | 2026-09-17 | M2.2 完成：`src/memory/working.py` 工作记忆，滑动窗口（条数上限）+ token 预算裁剪（超限丢最老的），17 条测试全绿 |
+| 2026-09-17 | M2.3 完成：`src/memory/episodic.py` 情景记忆，事件流写入 + 时间线（含同秒 id 兜底排序）+ 关键词检索 + 按类型筛选，23 条测试全绿 |
