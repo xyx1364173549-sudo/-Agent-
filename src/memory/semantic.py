@@ -33,6 +33,12 @@ CATEGORY_PREFERENCE = "preference"  # 学习偏好
 # 断句用的分隔符：中英文标点与空白
 _SENTENCE_SPLIT = re.compile(r"[，。,.！!？?\s]+")
 
+# 这些词本身不是知识点，只是口语里的填充词。
+# 规则版读不懂语义，只能靠一张小名单把它们挡掉——否则「感觉有点难」
+# 会被抽成「感觉 = 待加强」，看着像记了个笑话。
+# 将来换成大模型抽取后，这一整段可以删掉。
+_STOP_WORDS = frozenset({"感觉", "这个", "那个", "有点", "东西", "方面", "时候", "问题", "意思"})
+
 # 「规则版」的事实抽取模式。
 #
 # 每条是 (正则, 类目, 取值)，正则里的**第一个捕获组**就是要记的对象。
@@ -87,7 +93,7 @@ def extract_facts(text: str) -> list[dict[str, str]]:
                 continue
 
             key = match.group(1).strip()
-            if key:
+            if key and key not in _STOP_WORDS:
                 facts.append({"category": category, "key": key, "value": value})
     return facts
 

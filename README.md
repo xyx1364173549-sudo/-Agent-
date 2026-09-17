@@ -31,6 +31,7 @@
 │   ├── rag/          # 检索增强生成
 │   └── api/          # FastAPI 服务层
 ├── tests/            # 单元测试与边界测试
+├── examples/         # 可运行示例（demo_memory.py：分层记忆效果演示）
 ├── docs/             # 设计文档、实验记录
 ├── data/             # 数据文件（不入库）
 ├── .env.example      # 环境变量模板
@@ -50,8 +51,8 @@ pip install -r requirements.txt
 # 3. 配置密钥
 copy .env.example .env        # 然后填入自己的 API Key
 
-# 4. 运行
-python -m src.main
+# 4. 跑分层记忆 demo，直接看效果
+python examples/demo_memory.py
 ```
 
 ## 环境变量

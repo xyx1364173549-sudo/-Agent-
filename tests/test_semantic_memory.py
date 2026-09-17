@@ -298,6 +298,15 @@ def test_known_limitation_connector_leaks_into_key() -> None:
     assert [f["key"] for f in facts] == ["递归", "但二分查找"]
 
 
+def test_filler_words_are_not_treated_as_facts() -> None:
+    """口语填充词不能被当成知识点。
+
+    「感觉有点难」如果抽出「感觉 = 待加强」，看着就像记了个笑话。
+    规则版读不懂语义，只能靠一张小名单挡掉——换大模型抽取后可删此测试。
+    """
+    assert extract_facts("感觉有点难") == []
+
+
 def test_known_limitation_paraphrase_not_recognized() -> None:
     """换个说法就抽不到——这正是要用大模型改进它的理由。"""
     assert extract_facts("递归这个东西吧，我总觉得哪儿没通") == []
