@@ -63,8 +63,8 @@
 ## [M3] RAG 四件套 · 切分 / 向量化 / 检索 / 重排
 <!-- section: 第 6 章（创新点 3） -->
 
-- [ ] M3.1 文档加载与清洗 — 交付：`src/rag/loader.py`，支持 md/txt/pdf
-- [ ] M3.2 三种切分策略 — 交付：固定长度 / 递归 / 语义切分，`src/rag/splitter.py`
+- [x] M3.1 文档加载与清洗 — 交付：`src/rag/loader.py`，支持 md/txt/pdf
+- [x] M3.2 三种切分策略 — 交付：`src/rag/splitter.py`，固定长度 / 递归 / 语义（embed_fn 由 M3.3 注入）
 - [ ] M3.3 向量化与 Chroma 索引 — 交付：`src/rag/vectorstore.py`，持久化与增量更新
 - [ ] M3.4 检索器与重排 — 交付：向量 / 关键词 / 混合检索 + 重排，`src/rag/retriever.py`
 - [ ] M3.5 知识库构建脚本 — 交付：学习资料入库流水线 `scripts/build_kb.py`
@@ -132,3 +132,5 @@
 | 2026-09-17 | M2.6 完成：`src/memory/context.py` 上下文组装，按稳定性排序 + 预算裁剪，14 条测试全绿 |
 | 2026-09-17 | M2.7 完成：`src/memory/forgetting.py` 半衰期衰减 + 情景记忆归档与巩固；表结构升级到 v2（新增 `archived` 字段，含老库自动迁移），24 条测试全绿 |
 | 2026-09-17 | **M2 分层记忆模块全部完成（8/8）**：M2.8 端到端测试 + demo 升级为使用 MemoryManager，并新增遗忘曲线演示 |
+| 2026-09-17 | 修复看板不幂等导致的重复提交（去掉生成时间戳）；M2 阶段共出现三对「只改时间戳」的冗余提交 |
+| 2026-09-17 | **M3 开始**：M3.1 文档加载与清洗、M3.2 三种切分策略完成。**关键发现：DeepSeek 不提供 embedding 接口**（模型列表仅 deepseek-flash / deepseek-v4-pro），向量化改用 Chroma 自带的本地 ONNX 模型 |
