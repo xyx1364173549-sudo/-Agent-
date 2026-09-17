@@ -23,7 +23,8 @@ from src.config import get_settings
 #
 #   1  最初版本
 #   2  情景记忆加 archived 字段（支持「遗忘」时归档而不是删除）
-SCHEMA_VERSION = 2
+#   3  新增学习者画像两张表（掌握度 / 目标与偏好）
+SCHEMA_VERSION = 3
 
 # 建表语句。用 CREATE TABLE IF NOT EXISTS，重复执行不会报错，
 # 所以每次打开连接时顺手调一次是安全的。
@@ -69,6 +70,36 @@ CREATE TABLE IF NOT EXISTS semantic_memory (
     updated_at  TEXT NOT NULL,
     UNIQUE(user_id, category, key)
 );
+
+-- 学习者画像之一：每个知识点掌握到什么程度
+--
+-- 为什么不用语义记忆存？因为语义记忆里存的是**文本事实**
+-- （「递归 = 待加强」），给人看、给模型看都合适，但没法拿来做计算——
+-- 路径规划需要比较「递归 0.3」和「二分查找 0.7」谁更该先学。
+-- 所以掌握度单独用**数值**存一张表，两者是同一个人的两种粒度。
+CREATE TABLE IF NOT EXISTS learner_mastery (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id     TEXT NOT NULL,
+    topic       TEXT NOT NULL,              -- 知识点，例如「递归」
+    mastery     REAL NOT NULL DEFAULT 0.0,  -- 掌握度 0~1
+    attempts    INTEGER NOT NULL DEFAULT 0, -- 练过多少题
+    correct     INTEGER NOT NULL DEFAULT 0, -- 答对多少题
+    updated_at  TEXT NOT NULL,
+    UNIQUE(user_id, topic)
+);
+
+-- 学习者画像之二：用户级别的设置（学习目标、学习偏好）
+--
+-- 这类东西没有「多个知识点」的横向结构，就是一个名字对一个值，
+-- 所以用 key-value 存，不必为「目标」和「偏好」各建一张表。
+CREATE TABLE IF NOT EXISTS learner_meta (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id     TEXT NOT NULL,
+    key         TEXT NOT NULL,              -- goal / preference:xxx
+    value       TEXT NOT NULL,
+    updated_at  TEXT NOT NULL,
+    UNIQUE(user_id, key)
+);
 """
 
 
@@ -90,6 +121,14 @@ def _migrate(conn: sqlite3.Connection, from_version: int) -> None:
         columns = {row["name"] for row in conn.execute("PRAGMA table_info(episodic_memory)")}
         if "archived" not in columns:
             conn.execute("ALTER TABLE episodic_memory ADD COLUMN archived INTEGER NOT NULL DEFAULT 0")
+
+    if from_version < 3:
+        # v2 -> v3：新增学习者画像两张表。
+        # 这次不用写 ALTER：ALTER 只能给已有的表加列，而这里是**加表**，
+        # 建表语句里的 CREATE TABLE IF NOT EXISTS 已经覆盖了——它先于本函数执行。
+        # 保留这个分支是为了把升级路径写清楚：以后有人看到版本号变了，
+        # 能一眼确认「这次升级到底做了什么」。
+        pass
 
 
 def init_db(conn: sqlite3.Connection) -> None:
