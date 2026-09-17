@@ -10,3 +10,10 @@ python-dotenv>=1.0.1
 # ---------- M1 LLM 接入层 ----------
 # 直接用 DeepSeek 官方集成包（内部走 OpenAI 兼容协议）
 langchain-deepseek>=1.1.0
+
+# ---------- M3 RAG ----------
+# 向量库。它自带本地 ONNX 向量模型（首次使用会自动下载约 80MB）——
+# 之所以用本地模型，是因为 DeepSeek 不提供 embedding 接口，没得选。
+chromadb>=1.5.9
+# 读 PDF 资料用。不装也能跑，只是 .pdf 会提示怎么装，md/txt 不受影响
+pypdf>=5.0.0

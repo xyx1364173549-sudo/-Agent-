@@ -15,6 +15,7 @@ from __future__ import annotations
 import pytest
 
 from src.rag.retriever import (
+    Retriever,
     keyword_score,
     keyword_search,
     merge_results,
@@ -138,9 +139,9 @@ def test_keyword_search_returns_original_index() -> None:
 
 
 def test_merge_deduplicates() -> None:
-    """两个来源命中同一个块，只能算一条。"""
-    group_a = [{"index": 0, "text": "甲", "source": "vector"}]
-    group_b = [{"index": 0, "text": "甲", "source": "keyword"}]
+    """两路命中同一个块，只能算一条，并且要记下「两路都命中了它」。"""
+    group_a = [{"index": 0, "text": "甲", "source_type": "vector"}]
+    group_b = [{"index": 0, "text": "甲", "source_type": "keyword"}]
 
     merged = merge_results(group_a, group_b)
     assert len(merged) == 1
@@ -258,3 +259,155 @@ def test_rerank_tolerates_chatty_reply() -> None:
 
     result = rerank_with_llm("问题", candidates, top_k=2, model=model)
     assert [item["index"] for item in result] == [1, 0]
+
+
+# --------------------------------------------------------------------------
+# Retriever 编排
+# --------------------------------------------------------------------------
+
+
+class FakeStore:
+    """假向量库：直接返回预设结果，绕开 chromadb 与本地模型。
+
+    这样测的是 Retriever 的**编排逻辑**（模式分派、下标对齐、结果补全），
+    而不是向量库本身——那部分在 test_rag_vectorstore.py 里单独测。
+    """
+
+    def __init__(self, chunks: list[dict], hits: list[dict] | None = None) -> None:
+        self._chunks = chunks
+        self._hits = hits if hits is not None else []
+
+    def all_chunks(self) -> list[dict]:
+        return list(self._chunks)
+
+    def search(self, query: str, *, top_k: int = 5) -> list[dict]:
+        return list(self._hits[:top_k])
+
+
+CHUNKS = [
+    {"id": "c0", "text": "二分查找要求数组有序，每次把范围折半", "source": "算法.md"},
+    {"id": "c1", "text": "递归是函数自己调用自己，必须有终止条件", "source": "算法.md"},
+    {"id": "c2", "text": "Python 列表推导式可以一行生成列表", "source": "语法.md"},
+]
+
+# 假装向量检索只看语义，认为 c1 最相关
+VECTOR_HITS = [
+    {"id": "c1", "text": CHUNKS[1]["text"], "score": 0.93, "source": "算法.md"},
+    {"id": "c0", "text": CHUNKS[0]["text"], "score": 0.61, "source": "算法.md"},
+]
+
+
+def test_keyword_mode_uses_literal_match() -> None:
+    retriever = Retriever(FakeStore(CHUNKS))
+
+    results = retriever.search("递归终止条件", mode="keyword", top_k=3)
+
+    assert results
+    assert results[0]["index"] == 1
+    assert results[0]["source_type"] == "keyword"
+
+
+def test_vector_mode_uses_store_hits() -> None:
+    retriever = Retriever(FakeStore(CHUNKS, VECTOR_HITS))
+
+    results = retriever.search("循环调用自己", mode="vector", top_k=2)
+
+    assert [item["index"] for item in results] == [1, 0]
+    assert results[0]["source_type"] == "vector"
+
+
+def test_vector_mode_aligns_to_chunk_index() -> None:
+    """向量库给的是 id，要换成全库下标才能和关键词结果对齐去重。"""
+    retriever = Retriever(FakeStore(CHUNKS, VECTOR_HITS))
+
+    results = retriever.search("循环调用自己", mode="vector", top_k=2)
+
+    assert results[0]["index"] == 1
+    assert results[0]["source"] == "算法.md"
+
+
+def test_hybrid_mode_merges_both_paths() -> None:
+    """混合模式下两路都要有贡献。
+
+    「递归」这个词在 c1 里出现过，所以关键词那路也会命中它；
+    向量那路本来就把它排第一。两路重叠的块应当被标出来。
+    """
+    retriever = Retriever(FakeStore(CHUNKS, VECTOR_HITS))
+
+    results = retriever.search("递归", mode="hybrid", top_k=3)
+
+    assert results
+    hit_indexes = {item["index"] for item in results}
+    assert 1 in hit_indexes, "讲递归的那块必须在结果里"
+
+    merged_hit = next(item for item in results if item["index"] == 1)
+    assert merged_hit["sources"] == ["keyword", "vector"], "应当记录两路都命中了它"
+
+
+def test_hybrid_marks_sources() -> None:
+    """每个结果都要标明它被哪几路命中，方便事后分析哪路更有用。"""
+    retriever = Retriever(FakeStore(CHUNKS, VECTOR_HITS))
+
+    results = retriever.search("递归", mode="hybrid", top_k=3)
+    assert all("sources" in item for item in results)
+
+
+def test_hybrid_respects_top_k() -> None:
+    retriever = Retriever(FakeStore(CHUNKS, VECTOR_HITS))
+    assert len(retriever.search("递归", mode="hybrid", top_k=1)) == 1
+
+
+def test_invalid_mode_rejected() -> None:
+    retriever = Retriever(FakeStore(CHUNKS))
+    with pytest.raises(ValueError, match="检索模式"):
+        retriever.search("递归", mode="随便")
+
+
+@pytest.mark.parametrize("bad", [0, -1])
+def test_retriever_rejects_bad_top_k(bad: int) -> None:
+    retriever = Retriever(FakeStore(CHUNKS))
+    with pytest.raises(ValueError, match="top_k"):
+        retriever.search("递归", top_k=bad)
+
+
+def test_empty_store_returns_empty() -> None:
+    assert Retriever(FakeStore([])).search("递归") == []
+
+
+@pytest.mark.parametrize("blank", ["", "   "])
+def test_blank_query_returns_empty(blank: str) -> None:
+    assert Retriever(FakeStore(CHUNKS, VECTOR_HITS)).search(blank) == []
+
+
+def test_rerank_disabled_by_default() -> None:
+    """重排要多花一次模型调用，默认不能悄悄开。"""
+    model = FakeModel("2,1")
+    retriever = Retriever(FakeStore(CHUNKS, VECTOR_HITS))
+
+    results = retriever.search("递归", mode="vector", top_k=2, model=model)
+
+    assert model.prompts == [], "没开 rerank 就不该调模型"
+    assert results
+
+
+def test_rerank_reorders_results() -> None:
+    """开启重排后，顺序应当以模型的判断为准。"""
+    model = FakeModel("2,1")
+    retriever = Retriever(FakeStore(CHUNKS, VECTOR_HITS))
+
+    results = retriever.search("递归", mode="vector", top_k=2, rerank=True, model=model)
+
+    assert len(model.prompts) == 1, "应当只调一次模型"
+    assert results[0]["rank"] == 1
+    assert results[0]["index"] == 0, "模型说第 2 段最相关"
+
+
+def test_rerank_keeps_original_metadata() -> None:
+    """重排之后，下标和来源这些信息不能丢。"""
+    model = FakeModel("1")
+    retriever = Retriever(FakeStore(CHUNKS, VECTOR_HITS))
+
+    results = retriever.search("递归", mode="vector", top_k=2, rerank=True, model=model)
+
+    assert "source" in results[0]
+    assert "index" in results[0]

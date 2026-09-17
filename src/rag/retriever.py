@@ -27,8 +27,12 @@ from __future__ import annotations
 import json
 import re
 from collections.abc import Sequence
+from typing import TYPE_CHECKING
 
 from src.llm import create_chat_model
+
+if TYPE_CHECKING:  # 只为类型提示，运行时不必真的去加载 chromadb
+    from src.rag.vectorstore import VectorStore
 
 # 关键词检索默认返回几条
 DEFAULT_TOP_K = 5
@@ -194,7 +198,9 @@ def merge_results(
             index = item["index"]
             scores[index] = scores.get(index, 0.0) + 1.0 / (rank + 1)
             texts[index] = item["text"]
-            sources.setdefault(index, set()).add(item.get("source", "unknown"))
+            # 记下这一块是被哪一路命中的（vector / keyword）。
+            # 事后能拿它分析「哪路检索更有用」——论文实验二要的正是这个。
+            sources.setdefault(index, set()).add(str(item.get("source_type", "unknown")))
 
     merged = [
         {
@@ -207,6 +213,120 @@ def merge_results(
     ]
     merged.sort(key=lambda item: (-item["score"], item["index"]))
     return merged[:top_k]
+
+
+class Retriever:
+    """统一的检索入口：把三种检索方式和重排串成一条线。
+
+    用法::
+
+        retriever = Retriever(VectorStore())
+        retriever.search("循环调用自己是怎么回事", mode="hybrid", rerank=True)
+
+    模式说明：
+
+    ================ ==========================================================
+    ``vector``       只走向量检索。语义强，但可能漏掉字面精确匹配的内容
+    ``keyword``      只走关键词检索。字面准，但换个说法就搜不到
+    ``hybrid``       两路都跑再融合。实践里通常最好，也是默认值
+    ================ ==========================================================
+
+    注意上面这句话「混合通常更好」是**要靠实验验证的**，不是结论——
+    论文实验二正好拿这三种模式做横向对比，用数据说话。
+    """
+
+    def __init__(self, store: "VectorStore") -> None:
+        self.store = store
+
+    def _vector_group(self, query: str, top_k: int) -> list[dict]:
+        """向量检索，并把结果对齐到「全库下标」。
+
+        为什么要对齐下标？因为融合两路结果时需要统一的标识来判重——
+        向量库给的是 id，关键词检索给的是列表下标，不统一就没法比较。
+        """
+        chunks = self.store.all_chunks()
+        index_of = {chunk["id"]: position for position, chunk in enumerate(chunks)}
+
+        group: list[dict] = []
+        for hit in self.store.search(query, top_k=top_k):
+            position = index_of.get(hit["id"])
+            if position is None:
+                continue
+            group.append(
+                {
+                    "index": position,
+                    "text": hit["text"],
+                    "score": hit["score"],
+                    "source": hit["source"],
+                    "source_type": "vector",
+                }
+            )
+        return group
+
+    def search(
+        self,
+        query: str,
+        *,
+        mode: str = "hybrid",
+        top_k: int = DEFAULT_TOP_K,
+        rerank: bool = False,
+        model=None,
+    ) -> list[dict]:
+        """检索。
+
+        ``rerank=True`` 会在粗筛之后再用大模型精排一次。默认关着，因为它
+        **要多花一次模型调用**——典型用法是「混合检索召回 10 条 → 重排取 3 条」，
+        只在结果质量比响应速度更重要时才开。
+        """
+        if mode not in {"vector", "keyword", "hybrid"}:
+            raise ValueError(f"不支持的检索模式 {mode!r}，可选：vector / keyword / hybrid")
+        if top_k <= 0:
+            raise ValueError(f"top_k 需为正整数，实际为 {top_k}")
+
+        chunks = self.store.all_chunks()
+        if not chunks or not query.strip():
+            return []
+        texts = [chunk["text"] for chunk in chunks]
+
+        if mode == "keyword":
+            results = keyword_search(texts, query, top_k=top_k)
+            for item in results:
+                item["source_type"] = "keyword"
+                item["source"] = chunks[item["index"]]["source"]
+
+        elif mode == "vector":
+            results = self._vector_group(query, top_k)
+
+        else:  # hybrid：两路各多取一些，融合后再截断
+            pool = top_k * 2
+            keyword_group = keyword_search(texts, query, top_k=pool)
+            for item in keyword_group:
+                item["source_type"] = "keyword"
+
+            results = merge_results(
+                self._vector_group(query, pool),
+                keyword_group,
+                top_k=top_k,
+            )
+            for item in results:
+                item["source"] = chunks[item["index"]]["source"]
+
+        if rerank and results:
+            picked = rerank_with_llm(
+                query,
+                [item["text"] for item in results],
+                top_k=top_k,
+                model=model,
+            )
+            # 重排只返回「挑中的几条」，这里把原来的下标、来源补回去
+            by_text = {item["text"]: item for item in results}
+            results = [
+                {**by_text[item["text"]], "rank": item["rank"]}
+                for item in picked
+                if item["text"] in by_text
+            ]
+
+        return results
 
 
 def to_json(data: object) -> str:
