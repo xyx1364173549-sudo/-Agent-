@@ -3,10 +3,10 @@
 跑起来能看到什么？
 
     同一句提问「我最近在学什么？薄弱点在哪？」，问同一个模型两次：
-      - 情况 A：不带任何记忆 —— 模型只能瞎猜，或者说不知道
-      - 情况 B：带上分层记忆 —— 模型准确说出你在学递归、卡在终止条件
+      · 情况 A：不带任何记忆 —— 模型只能瞎猜，或者说不知道
+      · 情况 B：带上分层记忆 —— 模型准确说出你在学递归、卡在终止条件
 
-差别就是「分层记忆」的价值所在，也是论文实验一的雏形。
+    最后再演示一次「时间快进」：哪些记忆会被忘掉，哪些能留下来。
 
 运行方式::
 
@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import sys
+from datetime import datetime, timedelta
 from pathlib import Path
 
 # 让脚本能直接跑：把项目根目录加进模块搜索路径
@@ -27,7 +28,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.llm import create_chat_model  # noqa: E402
-from src.memory import EpisodicMemory, SemanticMemory, WorkingMemory, count_tokens  # noqa: E402
+from src.memory import MemoryManager, count_tokens, strength  # noqa: E402
 
 # Windows 控制台默认 GBK，打印中文可能报编码错，统一成 UTF-8
 if hasattr(sys.stdout, "reconfigure"):
@@ -36,6 +37,8 @@ if hasattr(sys.stdout, "reconfigure"):
 SESSION_ID = "demo-session"
 USER_ID = "demo-user"
 DEMO_DB = PROJECT_ROOT / "data" / "demo.db"
+
+LINE = "=" * 62
 
 # 模拟的一段对话：一个正在学递归、卡在终止条件的学生
 DIALOGUE = [
@@ -47,97 +50,64 @@ DIALOGUE = [
     ("assistant", "别急，我们一步步来"),
 ]
 
+# 从对话里沉淀出来的事件，带各自的重要程度
+EVENTS = [
+    ("chitchat", "聊了句今天天气不错", 0.2),
+    ("struggled", "练习递归 5 题，答错 3 题", 0.8),
+]
+
 # demo 最后要问模型的问题
 QUESTION = "根据你对我的了解，我最近在学什么？薄弱点在哪？"
 
+# 遗忘曲线要看的几个时间点（天）
+MILESTONES = (0, 7, 14, 30)
 
-def build_context(
-    working: WorkingMemory,
-    episodic: EpisodicMemory,
-    semantic: SemanticMemory,
-    *,
-    max_tokens: int = 600,
-) -> str:
-    """把三层记忆拼成一段能直接塞给模型的文字。
-
-    拼的顺序有讲究：**越稳定、越浓缩的记忆放越前面**。
-
-    1. 语义记忆 —— 已经沉淀的事实，最可靠，而且很短
-    2. 情景记忆 —— 最近发生的事，用来补时间线
-    3. 工作记忆 —— 最近的原话，最细但最占地方
-
-    这样即使后面 token 超了要砍，砍掉的也是最不重要的原文，
-    留下的仍是「这个人是什么水平」这个核心判断。
-    """
-    parts: list[str] = []
-
-    facts = semantic.all_facts()
-    if facts:
-        parts.append("【学习者情况】")
-        parts.extend(f"- {f['key']}：{f['value']}" for f in facts)
-
-    events = episodic.recent(5)
-    if events:
-        parts.append("【最近发生的事】")
-        parts.extend(f"- {e['created_at'][11:16]} {e['content']}" for e in events)
-
-    messages = working.messages(max_tokens=max_tokens)
-    if messages:
-        parts.append("【最近对话】")
-        parts.extend(f"- {m['role']}：{m['content']}" for m in messages)
-
-    return "\n".join(parts)
+# 归档阈值：强度低于它就算「想不起来了」
+FORGET_THRESHOLD = 0.2
 
 
 def main() -> int:
-    line = "=" * 62
-    print(line)
+    print(LINE)
     print(" 分层记忆 Demo：让 Agent 记住你是谁")
-    print(line)
+    print(LINE)
 
-    working = WorkingMemory(SESSION_ID, db_path=DEMO_DB)
-    episodic = EpisodicMemory(SESSION_ID, db_path=DEMO_DB)
-    semantic = SemanticMemory(USER_ID, db_path=DEMO_DB)
+    mem = MemoryManager(SESSION_ID, USER_ID, db_path=DEMO_DB)
 
     # 每次运行前清空，保证 demo 结果可复现
-    working.clear()
-    episodic.clear()
-    semantic.clear()
+    mem.clear()
 
     # ---------------------------------------------------------------- 第 1 步
     print("\n【第 1 步】模拟一段对话，写进三层记忆")
     print("-" * 62)
+    action_names = {"created": "新增", "reinforced": "再次确认", "updated": "更新", "kept": "保留旧结论"}
+
     for role, text in DIALOGUE:
-        working.add(role, text)
+        learned = mem.add_message(role, text)
         print(f"  工作记忆 ← {role}：{text}")
+        for item in learned:
+            print(f"      语义记忆 ← {item['key']} = {item['value']}（{action_names.get(item['action'], item['action'])}）")
 
-        # 用户说的话，顺手抽出事实存进语义记忆
-        if role == "user":
-            for item in semantic.learn_from_text(text, confidence=0.7):
-                action = {"created": "新增", "reinforced": "再次确认", "updated": "更新", "kept": "保留旧结论"}
-                print(f"      语义记忆 ← {item['key']} = {item['value']}（{action.get(item['action'], item['action'])}）")
-
-    episodic.record("struggled", "练习递归 5 题，答错 3 题", importance=0.8)
-    print("  情景记忆 ← 练习递归 5 题，答错 3 题（重要性 0.8）")
+    for event_type, content, importance in EVENTS:
+        mem.record_event(event_type, content, importance=importance)
+        print(f"  情景记忆 ← {content}（重要性 {importance}）")
 
     # ---------------------------------------------------------------- 第 2 步
     print("\n【第 2 步】三层记忆里现在存了什么")
     print("-" * 62)
 
     print("  语义记忆（档案卡片，沉淀的事实）")
-    for fact in semantic.all_facts():
+    for fact in mem.semantic.all_facts():
         print(f"    - {fact['key']}：{fact['value']}（置信度 {fact['confidence']:.1f}）")
-    if not semantic.all_facts():
-        print("    （空）")
 
     print("  情景记忆（日记，发生过的事）")
-    for event in episodic.recent(5):
-        print(f"    - {event['created_at'][11:16]}  {event['content']}")
+    for event in mem.episodic.recent(10):
+        print(f"    - {event['created_at'][11:16]}  {event['content']}（重要性 {event['importance']:.1f}）")
 
-    kept = working.messages()
-    print(f"  工作记忆（草稿纸，共 {working.count()} 条，取出 {len(kept)} 条 / 约 {sum(count_tokens(m['content']) for m in kept)} token）")
+    messages = mem.working.messages()
+    tokens = sum(count_tokens(m["content"]) for m in messages)
+    print(f"  工作记忆（草稿纸，共 {mem.working.count()} 条，取用 {len(messages)} 条 / 约 {tokens} token）")
 
-    context = build_context(working, episodic, semantic)
+    context = mem.context()
     print("\n  组装成给模型的上下文：")
     for text in context.splitlines():
         print(f"    | {text}")
@@ -152,24 +122,45 @@ def main() -> int:
     except RuntimeError as exc:
         print(f"  [跳过] 没法调用模型：{exc}")
         print("  提示：请在项目根目录建 .env 文件，写入 DEEPSEEK_API_KEY=sk-xxxx")
+        mem.close()
         return 1
 
     print("  ── 情况 A：不带任何记忆 ──")
-    answer_a = model.invoke(QUESTION).content
-    print(f"  {answer_a}\n")
+    print(f"  {model.invoke(QUESTION).content}\n")
 
     print("  ── 情况 B：带上分层记忆 ──")
-    answer_b = model.invoke(f"{context}\n\n{QUESTION}").content
-    print(f"  {answer_b}\n")
+    print(f"  {model.invoke(f'{context}\n\n{QUESTION}').content}\n")
 
-    print(line)
-    print(" Demo 结束。两种情况差别明显吗？")
-    print(" 差别越大，说明记忆起的作用越明显 —— 这正是论文实验一要量化的东西。")
-    print(line)
+    # ---------------------------------------------------------------- 第 4 步
+    print("\n【第 4 步】时间快进：记忆会怎样淡忘")
+    print("-" * 62)
+    print(f"  半衰期 7 天；强度低于 {FORGET_THRESHOLD} 就算想不起来了\n")
 
-    working.close()
-    episodic.close()
-    semantic.close()
+    header = f"  {'事件':<26}{'重要性':>7}" + "".join(f"{d}天后".rjust(9) for d in MILESTONES)
+    print(header)
+    for event in mem.episodic.recent(10):
+        cells = []
+        for days in MILESTONES:
+            moment = datetime.now() + timedelta(days=days)
+            cells.append(f"{strength(event['importance'], event['created_at'], now=moment):>9.2f}")
+        label = event["content"][:24]
+        print(f"  {label:<26}{event['importance']:>7.1f}" + "".join(cells))
+
+    # 选 7 天这个时间点：不重要的那条正好掉到阈值以下，重要的那条还挺得住，
+    # 差别才看得出来。拨到 30 天的话两条都忘光了，反而看不出「重要的事留得久」。
+    future = datetime.now() + timedelta(days=7)
+    archived = mem.episodic.forget_weak(threshold=FORGET_THRESHOLD, now=future)
+    print(f"\n  把时间拨到 7 天后 → {archived} 条被遗忘")
+    print(f"  还记着的：{[e['content'] for e in mem.episodic.recent(10)] or '（空）'}")
+    print(f"  已归档的：{mem.episodic.archived_count()} 条（数据还在库里，只是想不起来了）")
+    print("  注意：重要的事留下来了，不重要的事被忘掉——这就是「重要性越高越抗忘」。")
+
+    print("\n" + LINE)
+    print(" 两种情况差别明显吗？差别越大，说明记忆起的作用越明显。")
+    print(" 这正是论文实验一要量化的东西。")
+    print(LINE)
+
+    mem.close()
     return 0
 
 
