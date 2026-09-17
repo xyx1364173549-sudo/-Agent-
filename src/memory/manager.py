@@ -24,6 +24,7 @@
 
 from pathlib import Path
 
+from src.memory.context import DEFAULT_MAX_TOKENS, build_context
 from src.memory.episodic import EpisodicMemory
 from src.memory.semantic import SemanticMemory
 from src.memory.working import WorkingMemory
@@ -104,6 +105,20 @@ class MemoryManager:
             "events": self.episodic.count(),
             "facts": self.semantic.count(),
         }
+
+    # ---------- 组装 ----------
+
+    def context(self, *, max_tokens: int = DEFAULT_MAX_TOKENS) -> str:
+        """把三层记忆组装成一段可以直接喂给模型的文字。
+
+        这是分层记忆真正交付价值的出口：拿到的不是三堆散乱数据，
+        而是一段「这个人是什么水平、最近卡在哪、刚才聊了什么」的简报。
+
+        组装细节见 ``context.build_context``——简言之：按稳定性排序
+        （语义 → 情景 → 工作），总长度受 ``max_tokens`` 约束，
+        预算不够时先砍最啰嗦的原文。
+        """
+        return build_context(self.working, self.episodic, self.semantic, max_tokens=max_tokens)
 
     # ---------- 维护 ----------
 

@@ -56,7 +56,7 @@
 - [x] M2.3 情景记忆 EpisodicMemory — 交付：`src/memory/episodic.py`，事件流写入 + 时间线/关键词检索
 - [x] M2.4 语义记忆 SemanticMemory — 交付：`src/memory/semantic.py`，规则抽取 + 去重合并 + 冲突更新
 - [x] M2.5 记忆管理器 MemoryManager — 交付：`src/memory/manager.py`，三件套统一门面与路由
-- [ ] M2.6 记忆上下文组装 — 交付：分层检索 + 按预算压缩 + 优先级排序
+- [x] M2.6 记忆上下文组装 — 交付：`src/memory/context.py`，分层检索 + 按预算压缩 + 优先级排序
 - [ ] M2.7 遗忘与巩固策略 — 交付：时间衰减 + 重要性打分 + 归档
 - [ ] M2.8 记忆模块测试与演示 — 交付：测试全绿 + 可运行 demo 脚本
 
@@ -127,3 +127,6 @@
 | 2026-09-17 | M2.2 完成：`src/memory/working.py` 工作记忆，滑动窗口（条数上限）+ token 预算裁剪（超限丢最老的），17 条测试全绿 |
 | 2026-09-17 | M2.3 完成：`src/memory/episodic.py` 情景记忆，事件流写入 + 时间线（含同秒 id 兜底排序）+ 关键词检索 + 按类型筛选，23 条测试全绿 |
 | 2026-09-17 | M2.4 完成：`src/memory/semantic.py` 语义记忆，规则抽取 + 去重合并 + 冲突更新（created / reinforced / updated / kept 四态），46 条测试全绿 |
+| 2026-09-17 | 交付最小可运行 demo `examples/demo_memory.py`，用「同一提问、有无记忆」的对比展示效果 |
+| 2026-09-17 | M2.5 完成：`src/memory/manager.py` 记忆管理器，三件套统一入口；区分会话与用户两个维度，14 条测试全绿 |
+| 2026-09-17 | M2.6 完成：`src/memory/context.py` 上下文组装，按稳定性排序 + 预算裁剪，14 条测试全绿 |
